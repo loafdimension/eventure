@@ -1,14 +1,32 @@
 import Logo from "../components/Login/Logo";
 import Slogan from "../components/Login/Slogan";
 import LoginForm from "../components/Login/Login-Form";
+import GoogleContinue from "../components/Login/Google-Continue";
+import SignUpWithEmail from "../components/Login/SignUpWithEmail";
 
 function Login() {
   return (
-    <>
+    <div className="flex flex-col min-h-screen p-3">
       <Logo />
-      <Slogan />
-      <LoginForm />
-    </>
+      {/* Top section: Logo + Slogan */}
+      <div className="flex flex-col items-center mb-12">
+        <Slogan />
+      </div>
+
+      {/* Middle section: two columns */}
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* Left column: Google + Sign Up */}
+        <div className="flex-1 flex flex-col justify-center items-center gap-4">
+          <GoogleContinue />
+          <SignUpWithEmail />
+        </div>
+
+        {/* Right column: Login Form */}
+        <div className="flex-1 flex justify-center items-center">
+          <LoginForm />
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -6,18 +6,18 @@ function LoginForm({ onSubmit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ email, password });
+    onSubmit?.({ email, password });
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-4 w-full max-w-sm mx-auto p-6 bg-white rounded-lg shadow-md"
+      className="flex flex-col gap-4 w-full max-w-sm p-6 bg-white rounded-lg shadow-md"
     >
-      {/* login title */}
-      <h2 className="text-2xl font-bold text-center">Log In</h2>
+      {/* Title */}
+      <h2 className="text-2xl font-bold text-center mb-4">Log In</h2>
 
-      {/* email */}
+      {/* Email */}
       <div>
         <label className="block text-sm font-medium mb-1">Email</label>
         <input
@@ -29,7 +29,7 @@ function LoginForm({ onSubmit }) {
         />
       </div>
 
-      {/* password */}
+      {/* Password */}
       <div>
         <label className="block text-sm font-medium mb-1">Password</label>
         <input
@@ -41,16 +41,21 @@ function LoginForm({ onSubmit }) {
         />
       </div>
 
-      {/* log in button */}
-      <button
-        type="submit"
-        className="bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition"
-      >
-        Log In
-      </button>
-
-      {/* forgotten password */}
-      <button type="submit">Forgot password</button>
+      {/* Buttons */}
+      <div className="flex gap-4 items-center mt-2">
+        <button
+          type="submit"
+          className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition"
+        >
+          Log In
+        </button>
+        <button
+          type="button"
+          className="text-indigo-600 underline hover:text-indigo-800"
+        >
+          Forgot Password?
+        </button>
+      </div>
     </form>
   );
 }
