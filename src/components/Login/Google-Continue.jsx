@@ -1,7 +1,17 @@
+import { supabase } from "../../../supabaseClient";
+
 function GoogleContinue() {
-  const handleGoogleLogin = () => {
-    console.log("Continue with Google clicked");
-    // later: connect to Supabase OAuth
+  const handleGoogleLogin = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
+
+    if (error) {
+      console.error("Google login error:", error.message);
+    } else {
+      console.log("Redirecting to Google OAuth...");
+
+    }
   };
 
   return (
