@@ -1,5 +1,13 @@
+import Logo from "../components/Login/Logo";
+import Slogan from "../components/Login/Slogan";
+
 function Login() {
-  return <p>login</p>;
+  return (
+    <>
+      <Logo />
+      <Slogan />
+    </>
+  );
 }
 
 export default Login;
