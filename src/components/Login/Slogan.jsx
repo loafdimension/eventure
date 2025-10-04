@@ -1,7 +1,7 @@
 function Slogan() {
   return (
-    <p className="flex flex-col text-3xl items-center">
-      your next adventure awaits
+    <p className="flex flex-col text-3xl items-center mb-20">
+      Your next adventure awaits...
     </p>
   );
 }
