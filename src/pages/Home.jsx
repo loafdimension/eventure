@@ -1,5 +1,7 @@
+import NavBar from "../components/NavBar/NavBar";
+
 function Home() {
-  return <p className="text-4xl text-green-600 font-bold">home</p>;
+  return <NavBar />;
 }
 
 export default Home;

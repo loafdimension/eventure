@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Logo from "../components/Login/Logo";
+import Logo from "../components/NavBar/Logo";
 import Slogan from "../components/Login/Slogan";
 import LoginForm from "../components/Login/Login-Form";
 import GoogleContinue from "../components/Login/Google-Continue";

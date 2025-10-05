@@ -1,4 +1,4 @@
-import Logo from "../components/Login/Logo";
+import Logo from "../components/NavBar/Logo";
 import Slogan from "../components/Login/Slogan";
 import SignUpForm from "../components/Sign-Up/SignUpForm";
 
