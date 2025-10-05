@@ -17,28 +17,30 @@ function Login() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen p-3">
+    <>
       <NavBar />
-      {/* Top section: Logo + Slogan */}
-      <div className="flex flex-col items-center mb-12">
-        <Slogan />
-      </div>
-
-      {/* Middle section: two columns */}
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Left column: Google + Sign Up */}
-        <div className="flex-1 flex flex-col justify-center items-center gap-4">
-          <GoogleContinue />
-          <p>No account? No problem!</p>
-          <SignUpWithEmail />
+      <div className="flex flex-col min-h-screen p-3">
+        {/* Top section: Logo + Slogan */}
+        <div className="flex flex-col items-center mb-12">
+          <Slogan />
         </div>
 
-        {/* Right column: Login Form */}
-        <div className="flex-1 flex justify-center items-center">
-          <LoginForm onLogin={handleLogin} />
+        {/* Middle section: two columns */}
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Left column: Google + Sign Up */}
+          <div className="flex-1 flex flex-col justify-center items-center gap-4">
+            <GoogleContinue />
+            <p>No account? No problem!</p>
+            <SignUpWithEmail />
+          </div>
+
+          {/* Right column: Login Form */}
+          <div className="flex-1 flex justify-center items-center">
+            <LoginForm onLogin={handleLogin} />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

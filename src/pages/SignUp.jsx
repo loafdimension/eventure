@@ -4,13 +4,15 @@ import SignUpForm from "../components/Sign-Up/SignUpForm";
 
 function SignUp() {
   return (
-    <div className="flex flex-col min-h-screen p-3">
+    <>
       <NavBar />
-      <div className="flex flex-col items-center mb-12">
-        <Slogan />
-        <SignUpForm />
+      <div className="flex flex-col p-3">
+        <div className="flex flex-col items-center mb-12">
+          <Slogan />
+          <SignUpForm />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
