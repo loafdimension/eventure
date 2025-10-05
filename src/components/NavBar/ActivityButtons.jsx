@@ -5,7 +5,7 @@ import { FaSwimmer } from "react-icons/fa";
 
 function ActivityButtons() {
   return (
-    <div className="flex gap-9 p-6">
+    <div className="flex gap-20 p-6 ml-15">
       <FaWalking className="text-4xl" />
       <FaRunning className="text-4xl" />
       <GiMountainClimbing className="text-4xl" />
