@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Logo from "../components/NavBar/Logo";
+import NavBar from "../components/NavBar/NavBar";
 import Slogan from "../components/Login/Slogan";
 import LoginForm from "../components/Login/Login-Form";
 import GoogleContinue from "../components/Login/Google-Continue";
@@ -18,7 +18,7 @@ function Login() {
 
   return (
     <div className="flex flex-col min-h-screen p-3">
-      <Logo />
+      <NavBar />
       {/* Top section: Logo + Slogan */}
       <div className="flex flex-col items-center mb-12">
         <Slogan />

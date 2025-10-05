@@ -1,4 +1,6 @@
+import NavBar from "../components/NavBar/NavBar";
+
 function IndividualEvent() {
-  return <p>individual event</p>;
+  return <NavBar />;
 }
 export default IndividualEvent;

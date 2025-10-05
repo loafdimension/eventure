@@ -1,5 +1,7 @@
+import NavBar from "../components/NavBar/NavBar";
+
 function MyEvents() {
-  return <p>my events</p>;
+  return <NavBar />;
 }
 
 export default MyEvents;
