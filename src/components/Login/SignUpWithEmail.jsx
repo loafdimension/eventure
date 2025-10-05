@@ -1,7 +1,11 @@
+import { useNavigate } from "react-router-dom";
+
 function SignUpWithEmail() {
+  const navigate = useNavigate();
+
   const handleSignUp = () => {
     console.log("Sign up with Email clicked");
-    // later: redirect to sign up page or open modal
+    navigate("/signup");
   };
 
   return (

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Logo from "../components/Login/Logo";
 import Slogan from "../components/Login/Slogan";
 import LoginForm from "../components/Login/Login-Form";
@@ -5,6 +6,16 @@ import GoogleContinue from "../components/Login/Google-Continue";
 import SignUpWithEmail from "../components/Login/SignUpWithEmail";
 
 function Login() {
+  const [userProfile, setUserProfile] = useState(null);
+
+  // This will be called by LoginForm after successful login
+  const handleLogin = (user, profile) => {
+    setUserProfile(profile);
+    console.log("User logged in:", user);
+    console.log("Profile:", profile);
+    // Here you can redirect to dashboard or store user in context
+  };
+
   return (
     <div className="flex flex-col min-h-screen p-3">
       <Logo />
@@ -23,7 +34,7 @@ function Login() {
 
         {/* Right column: Login Form */}
         <div className="flex-1 flex justify-center items-center">
-          <LoginForm />
+          <LoginForm onLogin={handleLogin} />
         </div>
       </div>
     </div>
