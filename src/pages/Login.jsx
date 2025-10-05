@@ -19,7 +19,7 @@ function Login() {
   return (
     <>
       <NavBar />
-      <div className="flex flex-col min-h-screen p-3">
+      <div className="flex flex-col p-3">
         {/* Top section: Logo + Slogan */}
         <div className="flex flex-col items-center mb-12">
           <Slogan />
