@@ -29,6 +29,7 @@ function Login() {
         {/* Left column: Google + Sign Up */}
         <div className="flex-1 flex flex-col justify-center items-center gap-4">
           <GoogleContinue />
+          <p>No account? No problem!</p>
           <SignUpWithEmail />
         </div>
 
