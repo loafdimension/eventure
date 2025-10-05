@@ -8,7 +8,7 @@ function SignUp() {
       <Logo />
       <div className="flex flex-col items-center mb-12">
         <Slogan />
-        <SignUpForm/>
+        <SignUpForm />
       </div>
     </div>
   );
