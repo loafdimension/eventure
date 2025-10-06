@@ -14,7 +14,7 @@ function Home() {
       />
 
       <main className="flex-grow flex items-center justify-center bg-gray-50 p-10">
-        <div className="w-200 h-100 relative -mt-70">
+        <div className="w-200 h-100 relative -mt-80">
           <AnimatePresence mode="wait">
             <motion.img
               key={currentImage}
