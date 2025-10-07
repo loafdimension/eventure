@@ -1,6 +1,14 @@
 import { Link } from "react-router-dom";
 
 function NavBarButtons() {
+  const handleScrollToEvents = () => {
+    setTimeout(() => {
+      const section = document.getElementById("events-section");
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
+  };
   return (
     <nav className="w-full">
       <div className="flex flex-row items-center justify-between w-full px-10">
@@ -11,7 +19,7 @@ function NavBarButtons() {
           <Link to="/my-events" className="hover:text-indigo-600 text-xl">
             My Events & Calendar
           </Link>
-          <Link to="/" className="hover:text-indigo-600 text-xl">
+          <Link to="/#events-section" onClick={handleScrollToEvents} className="hover:text-indigo-600 text-xl">
             Find Event
           </Link>
         </div>
