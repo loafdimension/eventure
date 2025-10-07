@@ -3,7 +3,7 @@ import { supabase } from "../../../supabaseClient";
 
 function EventCard() {
   return (
-    <div className="border p-4 rouned-xl border-gray-400">
+    <div className="border-3 p-4 rounded-xl border-gray-400">
       <img
         src="../../../public/images/event-card-test.jpg"
         className="w-50 h-auto rounded-lg mb-2"
