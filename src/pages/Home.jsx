@@ -2,7 +2,6 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import NavBar from "../components/NavBar/NavBar";
 import Footer from "../components/Home/Footer";
-import EventCard from "../components/Home/EventCard";
 import EventList from "../components/Home/EventList";
 
 function Home() {
