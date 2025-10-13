@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import EventCard from "./EventCard";
 import { useEvents } from "../../../context/EventsContext";
 

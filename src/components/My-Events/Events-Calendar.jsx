@@ -20,7 +20,7 @@ const localiser = dateFnsLocalizer({
 
 function EventCalendar() {
   return (
-    <div className="flex justify-end p-15 rounded-xl">
+    <div className="flex justify-end mr-10 mt-5 rounded-xl">
       <Calendar
         localizer={localiser}
         startAccessor="start"
