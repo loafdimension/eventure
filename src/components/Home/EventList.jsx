@@ -1,22 +1,11 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../../../supabaseClient";
 import EventCard from "./EventCard";
+import { useEvents } from "../../../context/EventsContext";
 
 function EventList() {
-  const [events, setEvents] = useState([]);
+  const { events, loading } = useEvents();
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      const { data, error } = await supabase.from("events").select("*");
-
-      if (error) {
-        console.error("Error fetching events: ", error);
-      } else {
-        setEvents(data);
-      }
-    };
-    fetchEvents();
-  }, []);
+  if (loading) return <p>Loading events...</p>;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
