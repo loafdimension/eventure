@@ -1,5 +1,11 @@
-function EventsRow() {
-  return <div className="border">Upcoming events</div>;
+import EventRowCard from "./Event-Row-Card";
+
+function EventsRow({}) {
+  return (
+  <div>
+     <EventRowCard/>
+  </div>
+ )
 }
 
 export default EventsRow;
