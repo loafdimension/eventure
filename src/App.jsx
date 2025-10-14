@@ -16,7 +16,7 @@ function App() {
         <Route path="/my-events" element={<MyEvents />} />
         <Route path="/event/:id" element={<IndividualEvent />} />
         <Route path="/create-event" element={<CreateEvent />} />
-        <Route path="/signup" element={<SignUp />} />
+        <Route path="/signup-login" element={<SignUp />} />
       </Routes>
     </EventsProvider>
   );

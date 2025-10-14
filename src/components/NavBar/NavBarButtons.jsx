@@ -37,10 +37,10 @@ function NavBarButtons({ onLoginClick }) {
 
         <div className="flex flex-row">
           <Link
-            to="/signup"
+            to="/signup-login"
             className="hover:text-indigo-600 font-semibold text-xl"
           >
-            Sign Up
+            Sign Up / Log In
           </Link>
         </div>
       </div>
