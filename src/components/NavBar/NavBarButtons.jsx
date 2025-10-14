@@ -36,12 +36,21 @@ function NavBarButtons({ onLoginClick }) {
         </div>
 
         <div className="flex flex-row">
-          <Link
-            to="/signup-login"
-            className="hover:text-indigo-600 font-semibold text-xl"
-          >
-            Sign Up / Log In
-          </Link>
+          {isAuthenticated ? (
+            <button
+              onClick={handleSignOut}
+              className="hover:text-indigo-600 font-semibold text-xl"
+            >
+              Sign Out
+            </button>
+          ) : (
+            <Link
+              to="/signup-login"
+              className="hover:text-indigo-600 font-semibold text-xl"
+            >
+              Sign Up / Log In
+            </Link>
+          )}
         </div>
       </div>
     </nav>
