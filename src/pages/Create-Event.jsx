@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AlertTriangle, Loader2 } from "lucide-react";
 import NavBar from "../components/NavBar/NavBar";
 import { useAuth } from "../custom-hooks/useAuth";
 import { supabase } from "../../supabaseClient";
@@ -14,6 +15,9 @@ function CreateEvent() {
     location: "",
     price: "",
     description: "",
+    activity_type: "",
+    capacity: "",
+    image_url: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -45,9 +49,15 @@ function CreateEvent() {
       created_by: session.user.id,
       price_type: formData.price > 0 ? "fixed" : "free",
       price: parseFloat(formData.price) || 0,
+      activity_type: formData.activity_type,
+      capacity: parseInt(formData.capacity, 10) || null, 
+      image_url: formData.image_url || null,
     };
 
-    const { data, error } = await supabase.from("events").insert([newEvent]);
+    const { data, error } = await supabase
+      .from("events")
+      .insert([newEvent])
+      .select();
 
     setLoading(false);
 
@@ -64,97 +74,137 @@ function CreateEvent() {
   return (
     <>
       <NavBar />
-      <form className="ml-65 mr-65 mt-10" onSubmit={handleSubmit}>
-        <div className="flex flex-col gap-4 p-5">
-          {error && <p className="text-red-500 font-bold">{error}</p>}
 
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+        {error && (
+          <div
+            className={`p-4 mb-6 rounded-xl shadow-md flex items-center gap-3 bg-red-100 text-red-700`}
+          >
+            <AlertTriangle className="w-5 h-5" />
+            <p>{error}</p>
+          </div>
+        )}
+
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl space-y-6"
+        >
           <input
             type="text"
             name="title"
             placeholder="Event Title"
             value={formData.title}
             onChange={handleChange}
-            className="mt-2 text-2xl font-bold"
+            className="w-full text-3xl font-bold p-3 border-b-2 border-gray-200 focus:outline-none focus:border-indigo-500 rounded-md transition duration-150"
             required
           />
 
-          <p className="text-lg font-semibold">Activity Type: </p>
-          <div className="flex gap-5 text-lg">
-            <label className="flex gap-2">
-              <input type="checkbox" name="Activities" value="Walk"></input>Walk
-            </label>
-            <label className="flex gap-2">
-              <input type="checkbox" name="Activities" value="Run"></input>Run
-            </label>
-            <label className="flex gap-2">
-              <input type="checkbox" name="Activities" value="Climb"></input>
-              Climb
-            </label>
-            <label className="flex gap-2">
-              <input type="checkbox" name="Activities" value="Swim"></input>Swim
-            </label>
+          <div>
+            <p className="text-xl font-semibold text-gray-700 mb-3">
+              Activity Type:
+            </p>
+            <div className="flex flex-wrap gap-x-8 gap-y-3 text-lg">
+              {["Walk", "Run", "Climb", "Swim", "Other"].map((activity) => (
+                <label
+                  key={activity}
+                  className="flex items-center gap-2 cursor-pointer transition duration-150 ease-in-out hover:text-indigo-600"
+                >
+                  <input
+                    type="radio"
+                    name="activity_type"
+                    value={activity}
+                    checked={formData.activity_type === activity}
+                    onChange={handleChange}
+                    className="form-radio h-5 w-5 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                    required
+                  />
+                  {activity}
+                </label>
+              ))}
+            </div>
           </div>
 
-          <input
-            type="datetime-local"
-            name="event_date"
-            placeholder="Date and Time"
-            value={formData.event_date}
-            onChange={handleChange}
-            className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400 text-lg"
-            required
-          />
+          <label className="block">
+            <span className="text-lg font-medium text-gray-700">
+              Date & Time:
+            </span>
+            <input
+              type="datetime-local"
+              name="event_date"
+              value={formData.event_date}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg p-3 mt-1 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 text-lg transition"
+              required
+            />
+          </label>
 
           <input
             type="text"
             name="location"
-            placeholder="Location"
+            placeholder="Event Location (e.g., The Roaches, Peak District)"
             value={formData.location}
             onChange={handleChange}
-            className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400 text-lg"
+            className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 text-lg transition"
             required
           />
 
-          <input
-            type="number"
-            name="price"
-            placeholder="Price"
-            value={formData.price}
-            onChange={handleChange}
-            className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400 text-lg"
-            min="0"
-          />
-
-          <input
-            type="number"
-            placeholder="Capacity"
-            className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400 text-lg"
-          />
+          <div className="flex gap-4">
+            <input
+              type="number"
+              name="price"
+              placeholder="Price (0 for Free)"
+              value={formData.price}
+              onChange={handleChange}
+              className="w-1/2 border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 text-lg transition"
+              min="0"
+            />
+            <input
+              type="number"
+              name="capacity"
+              placeholder="Capacity (Max Attendees)"
+              value={formData.capacity}
+              onChange={handleChange}
+              className="w-1/2 border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 text-lg transition"
+              min="1"
+            />
+          </div>
 
           <textarea
             rows="4"
             name="description"
-            placeholder="Description"
+            placeholder="Detailed description of the event..."
             value={formData.description}
             onChange={handleChange}
-            className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400 text-lg"
+            className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 text-lg transition"
           />
 
           <input
             type="url"
-            placeholder="Image URL"
-            className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400 text-lg"
+            name="image_url"
+            placeholder="Image URL (e.g., link to a JPG/PNG)"
+            value={formData.image_url}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 text-lg transition"
           />
 
           <button
             type="submit"
-            disabled={loading} // Disable button while inserting data
-            className="bg-[#FFDD00] text-white font-medium py-3 px-6 rounded-lg hover:bg-[#EBBE0C] text-lg transition"
+            disabled={loading}
+            className={`w-full font-bold py-4 px-6 rounded-xl transition duration-300 text-xl ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed text-gray-200"
+                : "bg-[#FFDD00] text-gray-800 hover:bg-[#EBBE0C] shadow-md hover:shadow-lg"
+            }`}
           >
-            {loading ? "Creating..." : "Create"}
+            {loading ? (
+              <Loader2 className="animate-spin w-6 h-6 inline-block mr-2" />
+            ) : (
+              "Create Event"
+            )}
           </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </>
   );
 }
