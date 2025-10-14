@@ -1,22 +1,34 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../supabaseClient";
+import { supabase } from "../../supabaseClient";
 
-export default function useAuth() {
-  const [user, setUser] = useState(null);
+export function useAuth() {
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setUser(data.session?.user ?? null);
+    // 1. Get the initial session status
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
     });
 
+    // 2. Set up a listener for real-time changes
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        setUser(session?.user ?? null);
+        setSession(session);
+        setLoading(false);
       }
     );
 
-    return () => listener.subscription.unsubscribe();
+    // Clean up the listener on component unmount
+    return () => {
+      listener?.subscription.unsubscribe();
+    };
   }, []);
 
-  return user;
+  const signOut = async () => {
+    await supabase.auth.signOut();
+  };
+
+  return { session, loading, signOut, isAuthenticated: !!session };
 }

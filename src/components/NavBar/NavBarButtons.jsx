@@ -1,6 +1,13 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "../../custom-hooks/useAuth";
 
-function NavBarButtons() {
+function NavBarButtons({ onLoginClick }) {
+  const { isAuthenticated, signOut } = useAuth();
+
+  const handleSignOut = () => {
+    signOut();
+  };
+
   const handleScrollToEvents = () => {
     setTimeout(() => {
       const section = document.getElementById("events-section");
@@ -19,18 +26,16 @@ function NavBarButtons() {
           <Link to="/my-events" className="hover:text-indigo-600 text-xl">
             My Events & Calendar
           </Link>
-          <Link to="/#events-section" onClick={handleScrollToEvents} className="hover:text-indigo-600 text-xl">
+          <Link
+            to="/#events-section"
+            onClick={handleScrollToEvents}
+            className="hover:text-indigo-600 text-xl"
+          >
             Find Event
           </Link>
         </div>
 
-        <div className="flex flex-row gap-10">
-          <Link
-            to="/login"
-            className="hover:text-indigo-600 font-semibold text-xl"
-          >
-            Log In
-          </Link>
+        <div className="flex flex-row">
           <Link
             to="/signup"
             className="hover:text-indigo-600 font-semibold text-xl"

@@ -3,6 +3,7 @@ import Logo from "./Logo";
 import ActivityButtons from "./ActivityButtons";
 import NavBarButtons from "./NavBarButtons";
 
+
 function NavBar({ onHoverChange, onHoverLeave }) {
   const location = useLocation();
   const isHomePage = location.pathname === "/";
