@@ -1,11 +1,14 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../custom-hooks/useAuth";
 
-function NavBarButtons({ onLoginClick }) {
-  const { isAuthenticated, signOut } = useAuth();
+function NavBarButtons() {
+  const { isAuthenticated, signOut, userRole, loading } = useAuth();
+
+  const navigate = useNavigate();
 
   const handleSignOut = () => {
     signOut();
+    navigate("/");
   };
 
   const handleScrollToEvents = () => {
@@ -16,16 +19,28 @@ function NavBarButtons({ onLoginClick }) {
       }
     }, 100);
   };
+
+  if (loading) {
+    // return a loading spinner here later
+    return <div className="p-4">Loading navigation...</div>;
+  }
+
   return (
     <nav className="w-full">
       <div className="flex flex-row items-center justify-between w-full px-10">
         <div className="flex flex-row gap-25 ml-25">
-          <Link to="/create-event" className="hover:text-indigo-600 text-xl">
-            Create Event
-          </Link>
-          <Link to="/my-events" className="hover:text-indigo-600 text-xl">
-            My Events & Calendar
-          </Link>
+          {isAuthenticated && userRole === "admin" && (
+            <Link to="/create-event" className="hover:text-indigo-600 text-xl">
+              Create Event
+            </Link>
+          )}
+
+          {isAuthenticated && (
+            <Link to="/my-events" className="hover:text-indigo-600 text-xl">
+              My Events & Calendar
+            </Link>
+          )}
+
           <Link
             to="/#events-section"
             onClick={handleScrollToEvents}

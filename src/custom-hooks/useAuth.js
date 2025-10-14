@@ -4,31 +4,62 @@ import { supabase } from "../../supabaseClient";
 export function useAuth() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
-    // 1. Get the initial session status
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const handleAuthChange = async (session) => {
       setSession(session);
-      setLoading(false);
-    });
+      setUserRole(null);
 
-    // 2. Set up a listener for real-time changes
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        setLoading(false);
+      let role = null;
+
+      if (session) {
+
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", session.user.id)
+          .single();
+
+        if (error) {
+          console.error("Error fetching user role:", error);
+        } else if (data) {
+          role = data.role;
+        }
       }
-    );
 
-    // Clean up the listener on component unmount
-    return () => {
-      listener?.subscription.unsubscribe();
+      setUserRole(role);
+      setLoading(false);
     };
-  }, []);
+
+    const initializeAuth = async () => {
+      const {
+        data: { session: initialSession },
+      } = await supabase.auth.getSession();
+
+      await handleAuthChange(initialSession); 
+
+      const { data: listener } = supabase.auth.onAuthStateChange(
+        (_event, session) => {
+          handleAuthChange(session);
+        }
+      );
+
+      return () => {
+        listener?.subscription.unsubscribe();
+      };
+    };
+
+    const cleanup = initializeAuth();
+
+    return () => {
+      cleanup.then((unsubscribe) => unsubscribe());
+    };
+  }, []); 
 
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
-  return { session, loading, signOut, isAuthenticated: !!session };
+  return { session, loading, signOut, isAuthenticated: !!session, userRole };
 }
