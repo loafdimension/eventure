@@ -67,6 +67,63 @@ function IndividualEvent() {
     }
   };
 
+  const handleAddToGoogleCalendar = async () => {
+    if (!session) {
+      alert(
+        "You must be logged in with Google to add events to your calendar."
+      );
+      navigate("/login");
+      return;
+    }
+
+    const accessToken = session?.provider_token;
+    if (!accessToken) {
+      alert("Missing Google access token. Try logging out and back in.");
+      return;
+    }
+
+    try {
+      const eventData = {
+        summary: event.title,
+        description: event.description,
+        start: {
+          dateTime: new Date(event.event_date).toISOString(),
+          timeZone: "Europe/Berlin",
+        },
+        end: {
+          dateTime: new Date(
+            new Date(event.event_date).getTime() + 60 * 60 * 1000
+          ).toISOString(),
+          timeZone: "Europe/Berlin",
+        },
+      };
+
+      const response = await fetch(
+        "https://www.googleapis.com/calendar/v3/calendars/primary/events",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(eventData),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Failed to add to Google Calendar:", error);
+        alert("Failed to add event to Google Calendar.");
+        return;
+      }
+
+      alert("📅 Event added to your Google Calendar!");
+    } catch (err) {
+      console.error("Calendar API error:", err);
+      alert("Something went wrong adding the event to Google Calendar.");
+    }
+  };
+
   if (loading) {
     return (
       <>
@@ -127,6 +184,13 @@ function IndividualEvent() {
                   ? "Booked!"
                   : "Book Event"}
               </button>
+
+              <button
+                onClick={handleAddToGoogleCalendar}
+                className="mt-2 border rounded-lg px-4 py-2 bg-red-500 text-white hover:bg-red-600 transition"
+              >
+                Add to Google Calendar
+              </button>
             </div>
           </div>
         </div>
@@ -135,7 +199,7 @@ function IndividualEvent() {
           <h1 className="text-3xl font-bold">{event.title}</h1>
           <p>{event.description}</p>
           <p className="mt-5 font-bold">Date & Time</p>
-          <p> {format(new Date(event.event_date), "EEE, dd MMM yyy, HH:mm")}</p>
+          <p>{format(new Date(event.event_date), "EEE, dd MMM yyy, HH:mm")}</p>
           <p className="mt-5 font-bold">Location - {event.location}</p>
           <p>{event.location_description}</p>
           <p className="mt-5 font-bold">Weather</p>

@@ -9,12 +9,15 @@ export function useAuth() {
   useEffect(() => {
     const handleAuthChange = async (session) => {
       setSession(session);
+
+      console.log("Full Supabase session:", session);
+      console.log("Google provider token:", session?.provider_token);
+
       setUserRole(null);
 
       let role = null;
 
       if (session) {
-
         const { data, error } = await supabase
           .from("profiles")
           .select("role")
@@ -37,7 +40,7 @@ export function useAuth() {
         data: { session: initialSession },
       } = await supabase.auth.getSession();
 
-      await handleAuthChange(initialSession); 
+      await handleAuthChange(initialSession);
 
       const { data: listener } = supabase.auth.onAuthStateChange(
         (_event, session) => {
@@ -55,7 +58,7 @@ export function useAuth() {
     return () => {
       cleanup.then((unsubscribe) => unsubscribe());
     };
-  }, []); 
+  }, []);
 
   const signOut = async () => {
     await supabase.auth.signOut();
