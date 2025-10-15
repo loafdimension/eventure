@@ -9,12 +9,15 @@ function MyEvents() {
       <NavBar />
       <div className="flex flex-col lg:flex-row p-10">
         <div className="lg:w-2/4 flex flex-col items-center">
+          <p className="text-3xl font-bold mb-4 w-full text-center">
+            upcoming events
+          </p>
           <EventsRow />
-          <div className="mt-6 flex justify-center">
+          <div className="mt-6 flex justify-center w-full">
             <BookMoreEvents />
           </div>
         </div>
-        <div className="lg:w-2/4">
+        <div className="lg:w-2/4 mt-10 lg:mt-0">
           <EventCalendar />
         </div>
       </div>
