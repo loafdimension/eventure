@@ -1,15 +1,20 @@
 import NavBar from "../components/NavBar/NavBar";
 import { format } from "date-fns";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
+import { useAuth } from "../custom-hooks/useAuth";
 
 const DEFAULT_IMAGE_URL = "/images/event-card-default.jpg";
 
 function IndividualEvent() {
   const { id } = useParams();
-  const [event, setEvent] = useState();
+  const navigate = useNavigate();
+  const { session } = useAuth();
+
+  const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [bookingStatus, setBookingStatus] = useState(null);
 
   useEffect(() => {
     async function fetchEvent() {
@@ -29,6 +34,38 @@ function IndividualEvent() {
 
     fetchEvent();
   }, [id]);
+
+  const handleBookEvent = async () => {
+    if (!session) {
+      alert("You must be logged in to book an event!");
+      navigate("/login");
+      return;
+    }
+
+    if (bookingStatus === "loading") return;
+
+    setBookingStatus("loading");
+
+    const newBooking = {
+      user_id: session.user.id,
+      event_id: id,
+      status: "pending",
+    };
+
+    const { error } = await supabase.from("bookings").insert([newBooking]);
+
+    if (error) {
+      console.error("Booking error:", error);
+      setBookingStatus("error");
+      alert(
+        `Booking failed: ${error.message}. You might have already booked this event.`
+      );
+    } else {
+      setBookingStatus("success");
+      alert("🎉 Event successfully booked! Check your My Events page.");
+      navigate("/my-events");
+    }
+  };
 
   if (loading) {
     return (
@@ -70,8 +107,25 @@ function IndividualEvent() {
             <p className="mr-20">weather icon</p>
             <div className="border rounded-xl p-2 flex flex-col items-center shadow-md bg-white/90">
               <p className="text-lg font-semibold mb-2">${event.price}</p>
-              <button className="border rounded-lg px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 transition">
-                Book Event
+
+              <button
+                onClick={handleBookEvent}
+                disabled={
+                  bookingStatus === "loading" || bookingStatus === "success"
+                }
+                className={`border rounded-lg px-4 py-2 transition ${
+                  bookingStatus === "loading"
+                    ? "bg-gray-400 text-white cursor-not-allowed"
+                    : bookingStatus === "success"
+                    ? "bg-green-600 text-white cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
+                }`}
+              >
+                {bookingStatus === "loading"
+                  ? "Processing..."
+                  : bookingStatus === "success"
+                  ? "Booked!"
+                  : "Book Event"}
               </button>
             </div>
           </div>
