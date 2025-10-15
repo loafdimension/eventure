@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
 
-const DEFAULT_IMAGE_URL = "../../../public/images/event-card-default.jpg";
+const DEFAULT_IMAGE_URL = "/images/event-card-default.jpg";
 
 function EventCard({ event }) {
   const imageUrl = event.image_url || DEFAULT_IMAGE_URL;

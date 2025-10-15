@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
 
-const DEFAULT_IMAGE_URL = "../../../public/images/event-card-default.jpg";
+const DEFAULT_IMAGE_URL = "/images/event-card-default.jpg";
 
 function IndividualEvent() {
   const { id } = useParams();
