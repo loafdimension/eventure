@@ -4,6 +4,8 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
 
+const DEFAULT_IMAGE_URL = "../../../public/images/event-card-default.jpg";
+
 function IndividualEvent() {
   const { id } = useParams();
   const [event, setEvent] = useState();
@@ -46,12 +48,14 @@ function IndividualEvent() {
     );
   }
 
+  const imageUrl = event.image_url || DEFAULT_IMAGE_URL;
+
   return (
     <>
       <NavBar />
       <div className="p-10 flex flex-col items-center">
         <img
-          src={event.image}
+          src={imageUrl}
           alt={event.title}
           className="w-full max-w-3xl h-96 object-cover rounded-xl shadow-md mb-6"
         />
@@ -59,7 +63,7 @@ function IndividualEvent() {
         <div className="w-full max-w-3xl flex justify-between items-center mb-4">
           <div className="flex gap-2">
             <p className="border rounded-lg p-1">{event.capacity}</p>
-            <p className="border rounded-lg p-1">{event.event_type}</p>
+            <p className="border rounded-lg p-1">{event.activity_type}</p>
           </div>
 
           <div className="flex gap-3 items-center">

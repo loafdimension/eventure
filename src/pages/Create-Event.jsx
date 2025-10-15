@@ -17,17 +17,23 @@ function CreateEvent() {
     description: "",
     activity_type: "",
     capacity: "",
-    image_url: "",
   });
+
+  const [eventImage, setEventImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    const { name, value, files } = e.target;
+
+    if (name === "event_image" && files && files.length > 0) {
+      setEventImage(files[0]);
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -41,6 +47,41 @@ function CreateEvent() {
       return;
     }
 
+    let finalImageUrl = null;
+
+    if (eventImage) {
+
+      const fileExt = eventImage.name.split(".").pop();
+      const fileName = `${Date.now()}-${Math.random()
+        .toString(36)
+        .substring(2, 9)}.${fileExt}`;
+      const filePath = `${session.user.id}/${fileName}`;
+
+
+      const { error: uploadError } = await supabase.storage
+        .from("event_images") 
+        .upload(filePath, eventImage, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (uploadError) {
+        console.error("Error uploading image:", uploadError);
+
+        setEventImage(null);
+        setError("Failed to upload image. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+
+      const { data: urlData } = supabase.storage
+        .from("event_images") 
+        .getPublicUrl(filePath);
+
+      finalImageUrl = urlData.publicUrl;
+    }
+
     const newEvent = {
       title: formData.title,
       description: formData.description,
@@ -50,8 +91,8 @@ function CreateEvent() {
       price_type: formData.price > 0 ? "fixed" : "free",
       price: parseFloat(formData.price) || 0,
       activity_type: formData.activity_type,
-      capacity: parseInt(formData.capacity, 10) || null, 
-      image_url: formData.image_url || null,
+      capacity: parseInt(formData.capacity, 10) || null,
+      image_url: finalImageUrl, 
     };
 
     const { data, error } = await supabase
@@ -76,7 +117,6 @@ function CreateEvent() {
       <NavBar />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-
         {error && (
           <div
             className={`p-4 mb-6 rounded-xl shadow-md flex items-center gap-3 bg-red-100 text-red-700`}
@@ -179,14 +219,18 @@ function CreateEvent() {
             className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 text-lg transition"
           />
 
-          <input
-            type="url"
-            name="image_url"
-            placeholder="Image URL (e.g., link to a JPG/PNG)"
-            value={formData.image_url}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 text-lg transition"
-          />
+          <label className="block">
+            <span className="text-lg font-medium text-gray-700">
+              Event Image (JPG/PNG - Optional):
+            </span>
+            <input
+              type="file"
+              name="event_image" 
+              accept="image/jpeg, image/png" 
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg p-3 mt-1 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 text-lg transition"
+            />
+          </label>
 
           <button
             type="submit"

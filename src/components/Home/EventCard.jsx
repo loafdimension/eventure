@@ -1,7 +1,11 @@
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
 
+const DEFAULT_IMAGE_URL = "../../../public/images/event-card-default.jpg";
+
 function EventCard({ event }) {
+  const imageUrl = event.image_url || DEFAULT_IMAGE_URL;
+
   return (
     <Link
       to={`event/${event.id}`}
@@ -9,13 +13,17 @@ function EventCard({ event }) {
     >
       <div className="border-3 p-4 rounded-xl border-gray-400">
         <div className="w-full h-48 overflow-hidden rounded-lg mb-2">
-          <img src={event.image} className="w-full h-full object-cover"></img>
+          <img
+            src={imageUrl}
+            alt={event.title}
+            className="w-full h-full object-cover"
+          />
         </div>
 
         <div className="flex justify-between items-center mb-3">
           <div className="flex gap-2">
             <p className="border rounded-lg p-1">{event.capacity}</p>
-            <p className="border rounded-lg p-1">{event.event_type}</p>
+            <p className="border rounded-lg p-1">{event.activity_type}</p>
           </div>
           <p>weather</p>
         </div>
