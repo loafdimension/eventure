@@ -5,48 +5,67 @@ import { useAuth } from "../../custom-hooks/useAuth";
 import { Loader2 } from "lucide-react";
 
 function EventsRow() {
-  const { session } = useAuth();
-  const [bookedEvents, setBookedEvents] = useState([]);
+  const { session, userRole } = useAuth();
+  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    async function fetchBookedEvents() {
+    async function fetchEvents() {
       if (!session || !session.user) {
         setLoading(false);
-        setError("You must be logged in to view your booked events.");
+        setError("You must be logged in to view your events.");
         return;
       }
 
       setLoading(true);
       setError(null);
+
       const userId = session.user.id;
+      let data, error;
 
-      const { data, error } = await supabase
-        .from("bookings")
-        .select(
-          `
-          events ( * ) // Select all columns from the linked 'events' table
-        `
-        )
-        .eq("user_id", userId)
-        .order("booked_at", { ascending: true });
+      try {
+        if (userRole === "admin") {
+          // Admins see all events they have created
+          const response = await supabase
+            .from("events")
+            .select("*")
+            .eq("created_by", userId)
+            .order("event_date", { ascending: true });
 
-      setLoading(false);
+          data = response.data;
+          error = response.error;
+        } else {
+          // Normal users see only events they’ve booked
+          const response = await supabase
+            .from("bookings")
+            .select(
+              `
+              events (*)
+            `
+            )
+            .eq("user_id", userId)
+            .order("booked_at", { ascending: true });
 
-      if (error) {
-        console.error("Error fetching booked events:", error);
+          data = response.data
+            ?.map((item) => item.events)
+            .filter((e) => e !== null);
+          error = response.error;
+        }
+
+        if (error) throw error;
+
+        setEvents(data || []);
+      } catch (err) {
+        console.error("Error fetching events:", err);
         setError("Failed to load your events. Please try again.");
-      } else {
-        const eventsData = data
-          .map((item) => item.events)
-          .filter((e) => e !== null);
-        setBookedEvents(eventsData);
+      } finally {
+        setLoading(false);
       }
     }
 
-    fetchBookedEvents();
-  }, [session]);
+    fetchEvents();
+  }, [session, userRole]);
 
   if (loading) {
     return (
@@ -60,23 +79,23 @@ function EventsRow() {
     return <p className="text-xl p-4 text-red-600">Error: {error}</p>;
   }
 
-  if (bookedEvents.length === 0) {
+  if (events.length === 0) {
     return (
-      <div>
-        <div className="p-4 w-full">
-          <p className="text-gray-600">
-            You currently have no upcoming events booked.
-          </p>
-        </div>
+      <div className="p-4 w-full">
+        <p className="text-gray-600">
+          {userRole === "admin"
+            ? "You haven’t created any events yet."
+            : "You currently have no upcoming events booked."}
+        </p>
       </div>
     );
   }
 
   return (
     <div className="p-4 w-full">
-      {bookedEvents.map((event) => {
-        return <EventRowCard key={event.id} event={event} />;
-      })}
+      {events.map((event) => (
+        <EventRowCard key={event.id} event={event} />
+      ))}
     </div>
   );
 }
