@@ -32,22 +32,50 @@ function IndividualEvent() {
       setLoading(false);
     }
 
-    fetchEvent();
+    async function checkBooking() {
+      if (!session) return;
 
-    if (session) {
-      checkBooking();
+      const { data } = await supabase
+        .from("bookings")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .eq("event_id", id)
+        .single();
+
+      if (data) setBookingStatus("success");
     }
+
+    fetchEvent();
+    checkBooking();
   }, [id, session]);
 
-  const checkBooking = async () => {
-    const { data } = await supabase
-      .from("bookings")
-      .select("*")
-      .eq("user_id", session.user.id)
-      .eq("event_id", id)
-      .single();
+  const handleBookEvent = async () => {
+    if (!session) {
+      alert("You must be logged in to book an event!");
+      navigate("/login");
+      return;
+    }
 
-    if (data) setBookingStatus("success");
+    setBookingStatus("loading");
+
+    try {
+      const { error } = await supabase.from("bookings").insert([
+        {
+          user_id: session.user.id,
+          event_id: id,
+          status: "pending",
+        },
+      ]);
+
+      if (error) throw error;
+
+      alert("🎉 Event successfully booked!");
+      setBookingStatus("success");
+    } catch (err) {
+      console.error("Booking error:", err);
+      alert("❌ Failed to book the event.");
+      setBookingStatus("error");
+    }
   };
 
   const handleCancelBooking = async () => {
@@ -56,12 +84,13 @@ function IndividualEvent() {
     setBookingStatus("loading");
 
     try {
-      const { data: existingBookings } = await supabase
+      const { data: existingBookings, error } = await supabase
         .from("bookings")
         .select("id")
         .eq("user_id", session.user.id)
         .eq("event_id", id);
 
+      if (error) throw error;
       if (!existingBookings || existingBookings.length === 0) {
         alert("No booking found.");
         setBookingStatus(null);
@@ -70,14 +99,18 @@ function IndividualEvent() {
 
       const bookingId = existingBookings[0].id;
 
-      const { error } = await supabase.from("bookings").delete().eq("id", bookingId);
-      if (error) throw error;
+      const { error: deleteError } = await supabase
+        .from("bookings")
+        .delete()
+        .eq("id", bookingId);
 
-      alert("Booking cancelled successfully.");
-      setBookingStatus("cancelled");
+      if (deleteError) throw deleteError;
+
+      alert("🚫 Booking cancelled successfully.");
+      setBookingStatus(null);
     } catch (err) {
       console.error("Cancel booking error:", err);
-      alert("Failed to cancel booking.");
+      alert("❌ Failed to cancel booking.");
       setBookingStatus("error");
     }
   };
@@ -93,7 +126,7 @@ function IndividualEvent() {
       navigate("/my-events");
     } catch (err) {
       console.error("Delete event error:", err);
-      alert("Failed to delete event.");
+      alert("❌ Failed to delete event.");
     }
   };
 
@@ -127,7 +160,7 @@ function IndividualEvent() {
           className="w-full max-w-3xl h-96 object-cover rounded-xl shadow-md mb-6"
         />
 
-        <div className="w-full max-w-3xl flex justify-between items-center mb-4">
+        <div className="w-full max-w-3xl flex justify-between items-center mb-4 gap-4">
           <div className="flex gap-2">
             <p className="border rounded-lg p-1">{event.capacity}</p>
             <p className="border rounded-lg p-1">{event.activity_type}</p>
@@ -143,10 +176,15 @@ function IndividualEvent() {
               </button>
             ) : (
               <button
-                onClick={() => alert("You must book this event first.")}
-                className="border rounded-lg px-4 py-2 bg-blue-600 text-white cursor-not-allowed"
+                onClick={handleBookEvent}
+                disabled={bookingStatus === "loading"}
+                className={`border rounded-lg px-4 py-2 transition ${
+                  bookingStatus === "loading"
+                    ? "bg-gray-400 text-white cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
+                }`}
               >
-                Book Event
+                {bookingStatus === "loading" ? "Processing..." : "Book Event"}
               </button>
             )}
 
