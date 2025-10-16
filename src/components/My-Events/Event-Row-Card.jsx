@@ -37,7 +37,7 @@ function EventRowCard({ event, booked = false, onEventDeleted, onHoverDate }) {
         new Date(event.event_date).getTime() + 60 * 60 * 1000
       ).toISOString();
 
-      await addEventToGoogleCalendar(session.user.access_token, {
+      await addEventToGoogleCalendar(session.provider_token, {
         title: event.title,
         description: event.description,
         startTime,
