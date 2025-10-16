@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
 import { useAuth } from "../custom-hooks/useAuth";
+import { addEventToGoogleCalendar } from "../utils/googleCalendar";
 
 const DEFAULT_IMAGE_URL = "/images/event-card-default.jpg";
 
@@ -24,17 +25,13 @@ function IndividualEvent() {
         .eq("id", id)
         .single();
 
-      if (error) {
-        console.error(error);
-      } else {
-        setEvent(data);
-      }
+      if (error) console.error(error);
+      else setEvent(data);
       setLoading(false);
     }
 
     async function checkBooking() {
       if (!session) return;
-
       const { data } = await supabase
         .from("bookings")
         .select("*")
@@ -57,22 +54,17 @@ function IndividualEvent() {
     }
 
     setBookingStatus("loading");
-
     try {
-      const { error } = await supabase.from("bookings").insert([
-        {
-          user_id: session.user.id,
-          event_id: id,
-          status: "pending",
-        },
-      ]);
-
+      const { error } = await supabase
+        .from("bookings")
+        .insert([
+          { user_id: session.user.id, event_id: id, status: "pending" },
+        ]);
       if (error) throw error;
-
       alert("🎉 Event successfully booked!");
       setBookingStatus("success");
     } catch (err) {
-      console.error("Booking error:", err);
+      console.error(err);
       alert("❌ Failed to book the event.");
       setBookingStatus("error");
     }
@@ -80,36 +72,30 @@ function IndividualEvent() {
 
   const handleCancelBooking = async () => {
     if (!session) return;
-
     setBookingStatus("loading");
-
     try {
       const { data: existingBookings, error } = await supabase
         .from("bookings")
         .select("id")
         .eq("user_id", session.user.id)
         .eq("event_id", id);
-
       if (error) throw error;
-      if (!existingBookings || existingBookings.length === 0) {
+      if (!existingBookings.length) {
         alert("No booking found.");
         setBookingStatus(null);
         return;
       }
 
-      const bookingId = existingBookings[0].id;
-
       const { error: deleteError } = await supabase
         .from("bookings")
         .delete()
-        .eq("id", bookingId);
-
+        .eq("id", existingBookings[0].id);
       if (deleteError) throw deleteError;
 
       alert("🚫 Booking cancelled successfully.");
       setBookingStatus(null);
     } catch (err) {
-      console.error("Cancel booking error:", err);
+      console.error(err);
       alert("❌ Failed to cancel booking.");
       setBookingStatus("error");
     }
@@ -117,36 +103,52 @@ function IndividualEvent() {
 
   const handleDeleteEvent = async () => {
     if (!confirm("Are you sure you want to delete this event?")) return;
-
     try {
       const { error } = await supabase.from("events").delete().eq("id", id);
       if (error) throw error;
-
       alert("Event deleted successfully.");
       navigate("/my-events");
     } catch (err) {
-      console.error("Delete event error:", err);
+      console.error(err);
       alert("❌ Failed to delete event.");
     }
   };
 
-  if (loading) {
+  const handleAddToGoogleCalendar = async () => {
+    if (!session) return;
+    try {
+      const startTime = new Date(event.event_date).toISOString();
+      const endTime = new Date(
+        new Date(event.event_date).getTime() + 60 * 60 * 1000
+      ).toISOString();
+      await addEventToGoogleCalendar(session.user.access_token, {
+        title: event.title,
+        description: event.description,
+        startTime,
+        endTime,
+      });
+      alert("✅ Event added to your Google Calendar!");
+    } catch (err) {
+      console.error(err);
+      alert("❌ Failed to add event to Google Calendar");
+    }
+  };
+
+  if (loading)
     return (
       <>
         <NavBar />
         <div className="p-10 text-center text-gray-500">Loading event...</div>
       </>
     );
-  }
 
-  if (!event) {
+  if (!event)
     return (
       <>
         <NavBar />
         <div className="p-10 text-center text-red-500">Event not found</div>
       </>
     );
-  }
 
   const imageUrl = event.image_url || DEFAULT_IMAGE_URL;
 
@@ -168,12 +170,20 @@ function IndividualEvent() {
 
           <div className="flex gap-3 items-center">
             {bookingStatus === "success" ? (
-              <button
-                onClick={handleCancelBooking}
-                className="border rounded-lg px-4 py-2 bg-red-600 text-white hover:bg-red-700 transition"
-              >
-                Cancel Booking
-              </button>
+              <>
+                <button
+                  onClick={handleCancelBooking}
+                  className="border rounded-lg px-4 py-2 bg-red-600 text-white hover:bg-red-700 transition"
+                >
+                  Cancel Booking
+                </button>
+                <button
+                  onClick={handleAddToGoogleCalendar}
+                  className="border rounded-lg px-4 py-2 bg-green-600 text-white hover:bg-green-700 transition"
+                >
+                  Add to Google Calendar
+                </button>
+              </>
             ) : (
               <button
                 onClick={handleBookEvent}

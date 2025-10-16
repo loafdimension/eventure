@@ -5,28 +5,49 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../custom-hooks/useAuth";
 import { supabase } from "../../../supabaseClient";
 import { useState } from "react";
+import { addEventToGoogleCalendar } from "../../utils/googleCalendar";
 
-function EventRowCard({ event, onEventDeleted, onHoverDate }) {
+function EventRowCard({ event, booked = false, onEventDeleted, onHoverDate }) {
   const { session, userRole } = useAuth();
   const [loading, setLoading] = useState(false);
 
+  const isBooked = booked || event.booked || false;
+
   const handleDeleteEvent = async () => {
-    if (!session) return;
-    if (!confirm("Are you sure you want to delete this event?")) return;
+    if (!session || !confirm("Are you sure you want to delete this event?"))
+      return;
 
     setLoading(true);
-
     const { error } = await supabase.from("events").delete().eq("id", event.id);
     setLoading(false);
 
     if (error) {
-      console.error("Delete event error:", error);
       alert("Failed to delete event. Please try again.");
       return;
     }
 
-    alert("Event deleted successfully!");
     if (onEventDeleted) onEventDeleted(event.id);
+  };
+
+  const handleAddToGoogleCalendar = async () => {
+    if (!session) return;
+    try {
+      const startTime = new Date(event.event_date).toISOString();
+      const endTime = new Date(
+        new Date(event.event_date).getTime() + 60 * 60 * 1000
+      ).toISOString();
+
+      await addEventToGoogleCalendar(session.user.access_token, {
+        title: event.title,
+        description: event.description,
+        startTime,
+        endTime,
+      });
+
+      alert("✅ Event added to your Google Calendar!");
+    } catch (err) {
+      alert("❌ Failed to add event to Google Calendar");
+    }
   };
 
   let eventType = event.event_type;
@@ -38,7 +59,9 @@ function EventRowCard({ event, onEventDeleted, onHoverDate }) {
   return (
     <div
       className="mr-10 mt-5"
-      onMouseEnter={() => onHoverDate && onHoverDate(new Date(event.event_date))}
+      onMouseEnter={() =>
+        onHoverDate && onHoverDate(new Date(event.event_date))
+      }
       onMouseLeave={() => onHoverDate && onHoverDate(null)}
     >
       <Link
@@ -51,19 +74,31 @@ function EventRowCard({ event, onEventDeleted, onHoverDate }) {
             {format(new Date(event.event_date), "EEE, dd MMM yyy, HH:mm")}
           </p>
           <p className="col-start-1 row-start-2 font-semibold">{event.title}</p>
-          <p className="col-start-3 row-start-3 text-gray-700">{event.location}</p>
+          <p className="col-start-3 row-start-3 text-gray-700">
+            {event.location}
+          </p>
         </div>
       </Link>
 
-      {userRole === "admin" && (
-        <button
-          onClick={handleDeleteEvent}
-          disabled={loading}
-          className="mt-2 border rounded-lg px-3 py-1 bg-red-600 text-white hover:bg-red-700 transition"
-        >
-          {loading ? "Deleting..." : "Delete Event"}
-        </button>
-      )}
+      <div className="flex gap-2 mt-2">
+        {userRole === "admin" && (
+          <button
+            onClick={handleDeleteEvent}
+            disabled={loading}
+            className="border rounded-lg px-3 py-1 bg-red-600 text-white hover:bg-red-700 transition"
+          >
+            {loading ? "Deleting..." : "Delete Event"}
+          </button>
+        )}
+        {isBooked && (
+          <button
+            onClick={handleAddToGoogleCalendar}
+            className="border rounded-lg px-3 py-1 bg-green-600 text-white hover:bg-green-700 transition"
+          >
+            Add to Google Calendar
+          </button>
+        )}
+      </div>
     </div>
   );
 }

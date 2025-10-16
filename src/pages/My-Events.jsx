@@ -46,7 +46,7 @@ function MyEvents() {
           <p className="text-3xl font-bold mb-4 w-full text-center">
             upcoming events
           </p>
-          <EventsRow setHoverDate={setHoverDate} />
+          <EventsRow onHoverDate={setHoverDate} />
           <div className="mt-6 flex justify-center w-full">
             <BookMoreEvents />
           </div>

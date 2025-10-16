@@ -11,13 +11,11 @@ const locales = { "en-GB": enGB };
 const localiser = dateFnsLocalizer({ format, parse, startOfWeek, getDay, locales });
 
 function EventCalendar({ bookedEvents, hoverDate }) {
-  // bookedEvents: array of { id, title, start, end } format
-  // hoverDate: the date being hovered in EventsRow
 
   const eventStyleGetter = (event) => {
     return {
       style: {
-        backgroundColor: "#3b82f6", // booked event color
+        backgroundColor: "#3b82f6", 
         color: "white",
         borderRadius: "4px",
         border: "none",
@@ -26,10 +24,9 @@ function EventCalendar({ bookedEvents, hoverDate }) {
   };
 
   const dayPropGetter = (date) => {
-    // highlight day if hoverDate matches
     if (hoverDate && date.toDateString() === hoverDate.toDateString()) {
       return {
-        style: { backgroundColor: "#fde68a" }, // hover highlight color
+        style: { backgroundColor: "#fde68a" }, 
       };
     }
     return {};

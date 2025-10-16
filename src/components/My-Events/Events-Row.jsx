@@ -4,7 +4,7 @@ import { supabase } from "../../../supabaseClient";
 import { useAuth } from "../../custom-hooks/useAuth";
 import { Loader2 } from "lucide-react";
 
-function EventsRow({ setHoverDate }) {
+function EventsRow({ onHoverDate }) {
   const { session, userRole } = useAuth();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,33 +21,30 @@ function EventsRow({ setHoverDate }) {
       setLoading(true);
       setError(null);
 
-      const userId = session.user.id;
-      let data, error;
-
       try {
+        let data;
+
         if (userRole === "admin") {
           const response = await supabase
             .from("events")
             .select("*")
-            .eq("created_by", userId)
+            .eq("created_by", session.user.id)
             .order("event_date", { ascending: true });
-
-          data = response.data;
-          error = response.error;
+          data = response.data || [];
         } else {
           const response = await supabase
             .from("bookings")
-            .select(`events (*)`)
-            .eq("user_id", userId)
+            .select(`events(*)`)
+            .eq("user_id", session.user.id)
             .order("booked_at", { ascending: true });
 
-          data = response.data?.map((item) => item.events).filter((e) => e !== null);
-          error = response.error;
+          data = response.data
+            .map((b) => b.events)
+            .filter((e) => e !== null)
+            .map((e) => ({ ...e, booked: true })); 
         }
 
-        if (error) throw error;
-
-        setEvents(data || []);
+        setEvents(data);
       } catch (err) {
         console.error("Error fetching events:", err);
         setError("Failed to load your events. Please try again.");
@@ -60,7 +57,9 @@ function EventsRow({ setHoverDate }) {
   }, [session, userRole]);
 
   const handleEventDeleted = (deletedEventId) => {
-    setEvents((prevEvents) => prevEvents.filter((e) => e.id !== deletedEventId));
+    setEvents((prevEvents) =>
+      prevEvents.filter((e) => e.id !== deletedEventId)
+    );
   };
 
   if (loading) {
@@ -93,8 +92,9 @@ function EventsRow({ setHoverDate }) {
         <EventRowCard
           key={event.id}
           event={event}
-          onEventDeleted={handleEventDeleted} 
-          onHoverDate={setHoverDate}
+          booked={true} 
+          onEventDeleted={handleEventDeleted}
+          onHoverDate={onHoverDate} 
         />
       ))}
     </div>
