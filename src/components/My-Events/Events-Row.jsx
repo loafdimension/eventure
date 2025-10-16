@@ -4,7 +4,7 @@ import { supabase } from "../../../supabaseClient";
 import { useAuth } from "../../custom-hooks/useAuth";
 import { Loader2 } from "lucide-react";
 
-function EventsRow() {
+function EventsRow({ setHoverDate }) {
   const { session, userRole } = useAuth();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -94,6 +94,7 @@ function EventsRow() {
           key={event.id}
           event={event}
           onEventDeleted={handleEventDeleted} 
+          onHoverDate={setHoverDate}
         />
       ))}
     </div>

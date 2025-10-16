@@ -6,7 +6,7 @@ import { useAuth } from "../../custom-hooks/useAuth";
 import { supabase } from "../../../supabaseClient";
 import { useState } from "react";
 
-function EventRowCard({ event, onEventDeleted }) {
+function EventRowCard({ event, onEventDeleted, onHoverDate }) {
   const { session, userRole } = useAuth();
   const [loading, setLoading] = useState(false);
 
@@ -26,7 +26,7 @@ function EventRowCard({ event, onEventDeleted }) {
     }
 
     alert("Event deleted successfully!");
-    if (onEventDeleted) onEventDeleted(event.id); 
+    if (onEventDeleted) onEventDeleted(event.id);
   };
 
   let eventType = event.event_type;
@@ -36,7 +36,11 @@ function EventRowCard({ event, onEventDeleted }) {
   if (event.event_type === "climb") eventType = <GiMountainClimbing />;
 
   return (
-    <div className="mr-10 mt-5">
+    <div
+      className="mr-10 mt-5"
+      onMouseEnter={() => onHoverDate && onHoverDate(new Date(event.event_date))}
+      onMouseLeave={() => onHoverDate && onHoverDate(null)}
+    >
       <Link
         to={`/event/${event.id}`}
         className="block hover:scale-105 transition-transform duration-200 border-3 p-3 rounded-xl border-gray-400"
