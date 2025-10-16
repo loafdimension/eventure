@@ -26,7 +26,6 @@ function EventsRow() {
 
       try {
         if (userRole === "admin") {
-          // Admins see all events they have created
           const response = await supabase
             .from("events")
             .select("*")
@@ -36,7 +35,6 @@ function EventsRow() {
           data = response.data;
           error = response.error;
         } else {
-          // Normal users see only events they’ve booked
           const response = await supabase
             .from("bookings")
             .select(

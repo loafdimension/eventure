@@ -3,6 +3,7 @@ import { FaWalking } from "react-icons/fa";
 import { FaRunning } from "react-icons/fa";
 import { GiMountainClimbing } from "react-icons/gi";
 import { FaSwimmer } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 function EventRowCard({ event }) {
   let eventType = event.event_type;
@@ -25,16 +26,21 @@ function EventRowCard({ event }) {
 
   return (
     <div className="mr-10 mt-5">
-      <div className="block hover:scale-105 transition-transform duration-200 border-3 p-3 rounded-xl border-gray-400">
+      <Link
+        to={`/event/${event.id}`} 
+        className="block hover:scale-105 transition-transform duration-200 border-3 p-3 rounded-xl border-gray-400"
+      >
         <div className="grid grid-cols-3 grid-rows-3 p-2">
           <p className="col-start-1 row-start-1">{eventType}</p>
           <p className="col-start-3 row-start-1">
             {format(new Date(event.event_date), "EEE, dd MMM yyy, HH:mm")}
           </p>
-          <p className="col-start-1 row-start-2">{event.title}</p>
-          <p className="col-start-3 row-start-3">{event.location}</p>
+          <p className="col-start-1 row-start-2 font-semibold">{event.title}</p>
+          <p className="col-start-3 row-start-3 text-gray-700">
+            {event.location}
+          </p>
         </div>
-      </div>
+      </Link>
     </div>
   );
 }
