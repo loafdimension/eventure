@@ -10,7 +10,7 @@ const DEFAULT_IMAGE_URL = "/images/event-card-default.jpg";
 function IndividualEvent() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { session } = useAuth();
+  const { session, userRole } = useAuth();
 
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -33,94 +33,67 @@ function IndividualEvent() {
     }
 
     fetchEvent();
-  }, [id]);
 
-  const handleBookEvent = async () => {
-    if (!session) {
-      alert("You must be logged in to book an event!");
-      navigate("/login");
-      return;
+    if (session) {
+      checkBooking();
     }
+  }, [id, session]);
 
-    if (bookingStatus === "loading") return;
+  const checkBooking = async () => {
+    const { data } = await supabase
+      .from("bookings")
+      .select("*")
+      .eq("user_id", session.user.id)
+      .eq("event_id", id)
+      .single();
+
+    if (data) setBookingStatus("success");
+  };
+
+  const handleCancelBooking = async () => {
+    if (!session) return;
 
     setBookingStatus("loading");
 
-    const newBooking = {
-      user_id: session.user.id,
-      event_id: id,
-      status: "pending",
-    };
-
-    const { error } = await supabase.from("bookings").insert([newBooking]);
-
-    if (error) {
-      console.error("Booking error:", error);
-      setBookingStatus("error");
-      alert(
-        `Booking failed: ${error.message}. You might have already booked this event.`
-      );
-    } else {
-      setBookingStatus("success");
-      alert("🎉 Event successfully booked! Check your My Events page.");
-      navigate("/my-events");
-    }
-  };
-
-  const handleAddToGoogleCalendar = async () => {
-    if (!session) {
-      alert(
-        "You must be logged in with Google to add events to your calendar."
-      );
-      navigate("/login");
-      return;
-    }
-
-    const accessToken = session?.provider_token;
-    if (!accessToken) {
-      alert("Missing Google access token. Try logging out and back in.");
-      return;
-    }
-
     try {
-      const eventData = {
-        summary: event.title,
-        description: event.description,
-        start: {
-          dateTime: new Date(event.event_date).toISOString(),
-          timeZone: "Europe/Berlin",
-        },
-        end: {
-          dateTime: new Date(
-            new Date(event.event_date).getTime() + 60 * 60 * 1000
-          ).toISOString(),
-          timeZone: "Europe/Berlin",
-        },
-      };
+      const { data: existingBookings } = await supabase
+        .from("bookings")
+        .select("id")
+        .eq("user_id", session.user.id)
+        .eq("event_id", id);
 
-      const response = await fetch(
-        "https://www.googleapis.com/calendar/v3/calendars/primary/events",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(eventData),
-        }
-      );
-
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("Failed to add to Google Calendar:", error);
-        alert("Failed to add event to Google Calendar.");
+      if (!existingBookings || existingBookings.length === 0) {
+        alert("No booking found.");
+        setBookingStatus(null);
         return;
       }
 
-      alert("📅 Event added to your Google Calendar!");
+      const bookingId = existingBookings[0].id;
+
+      const { error } = await supabase.from("bookings").delete().eq("id", bookingId);
+      if (error) throw error;
+
+      alert("Booking cancelled successfully.");
+      setBookingStatus("cancelled");
     } catch (err) {
-      console.error("Calendar API error:", err);
-      alert("Something went wrong adding the event to Google Calendar.");
+      console.error("Cancel booking error:", err);
+      alert("Failed to cancel booking.");
+      setBookingStatus("error");
+    }
+  };
+
+  const handleDeleteEvent = async () => {
+    if (!confirm("Are you sure you want to delete this event?")) return;
+
+    try {
+      const { error } = await supabase.from("events").delete().eq("id", id);
+      if (error) throw error;
+
+      alert("Event deleted successfully.");
+      navigate("/my-events");
+    } catch (err) {
+      console.error("Delete event error:", err);
+      alert("Failed to delete event.");
     }
   };
 
@@ -161,37 +134,30 @@ function IndividualEvent() {
           </div>
 
           <div className="flex gap-3 items-center">
-            <p className="mr-20">weather icon</p>
-            <div className="border rounded-xl p-2 flex flex-col items-center shadow-md bg-white/90">
-              <p className="text-lg font-semibold mb-2">${event.price}</p>
-
+            {bookingStatus === "success" ? (
               <button
-                onClick={handleBookEvent}
-                disabled={
-                  bookingStatus === "loading" || bookingStatus === "success"
-                }
-                className={`border rounded-lg px-4 py-2 transition ${
-                  bookingStatus === "loading"
-                    ? "bg-gray-400 text-white cursor-not-allowed"
-                    : bookingStatus === "success"
-                    ? "bg-green-600 text-white cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700"
-                }`}
+                onClick={handleCancelBooking}
+                className="border rounded-lg px-4 py-2 bg-red-600 text-white hover:bg-red-700 transition"
               >
-                {bookingStatus === "loading"
-                  ? "Processing..."
-                  : bookingStatus === "success"
-                  ? "Booked!"
-                  : "Book Event"}
+                Cancel Booking
               </button>
-
+            ) : (
               <button
-                onClick={handleAddToGoogleCalendar}
-                className="mt-2 border rounded-lg px-4 py-2 bg-red-500 text-white hover:bg-red-600 transition"
+                onClick={() => alert("You must book this event first.")}
+                className="border rounded-lg px-4 py-2 bg-blue-600 text-white cursor-not-allowed"
               >
-                Add to Google Calendar
+                Book Event
               </button>
-            </div>
+            )}
+
+            {userRole === "admin" && (
+              <button
+                onClick={handleDeleteEvent}
+                className="border rounded-lg px-4 py-2 bg-red-600 text-white hover:bg-red-700 transition"
+              >
+                Delete Event
+              </button>
+            )}
           </div>
         </div>
 
@@ -202,14 +168,6 @@ function IndividualEvent() {
           <p>{format(new Date(event.event_date), "EEE, dd MMM yyy, HH:mm")}</p>
           <p className="mt-5 font-bold">Location - {event.location}</p>
           <p>{event.location_description}</p>
-          <p className="mt-5 font-bold">Weather</p>
-          <p>
-            weather description, blah blah blah, sunshine oh wait no maybe cloud
-            ph wait no maybe rain yes rain oh wait no tornado oh wait no thunder
-            ohhhhh sunshine, its sunshine and rainbows
-          </p>
-
-          <button className="border rounded-lg p-1 self-end">share</button>
         </div>
       </div>
     </>

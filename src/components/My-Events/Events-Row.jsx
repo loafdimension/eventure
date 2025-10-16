@@ -37,17 +37,11 @@ function EventsRow() {
         } else {
           const response = await supabase
             .from("bookings")
-            .select(
-              `
-              events (*)
-            `
-            )
+            .select(`events (*)`)
             .eq("user_id", userId)
             .order("booked_at", { ascending: true });
 
-          data = response.data
-            ?.map((item) => item.events)
-            .filter((e) => e !== null);
+          data = response.data?.map((item) => item.events).filter((e) => e !== null);
           error = response.error;
         }
 
@@ -64,6 +58,10 @@ function EventsRow() {
 
     fetchEvents();
   }, [session, userRole]);
+
+  const handleEventDeleted = (deletedEventId) => {
+    setEvents((prevEvents) => prevEvents.filter((e) => e.id !== deletedEventId));
+  };
 
   if (loading) {
     return (
@@ -92,7 +90,11 @@ function EventsRow() {
   return (
     <div className="p-4 w-full">
       {events.map((event) => (
-        <EventRowCard key={event.id} event={event} />
+        <EventRowCard
+          key={event.id}
+          event={event}
+          onEventDeleted={handleEventDeleted} 
+        />
       ))}
     </div>
   );
