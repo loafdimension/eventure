@@ -28,7 +28,7 @@ function MyEvents() {
             id: e.id,
             title: e.title,
             start: new Date(e.event_date),
-            end: new Date(new Date(e.event_date).getTime() + 60 * 60 * 1000), // default 1h
+            end: new Date(new Date(e.event_date).getTime() + 60 * 60 * 1000), 
           }));
 
         setBookedEvents(formatted);

@@ -161,21 +161,35 @@ function IndividualEvent() {
   };
 
   const handleAddToGoogleCalendar = async () => {
-    if (!session) return;
+    if (!session) {
+      alert("You must be logged in to add events to Google Calendar!");
+      return;
+    }
+
+    const googleToken =
+      session.provider_token || session.user?.app_metadata?.provider_token;
+
+    if (!googleToken || !googleToken.access_token) {
+      alert("Please connect your Google account first!");
+      return;
+    }
+
     try {
       const startTime = new Date(event.event_date).toISOString();
       const endTime = new Date(
         new Date(event.event_date).getTime() + 60 * 60 * 1000
       ).toISOString();
-      await addEventToGoogleCalendar(session.user.access_token, {
+
+      await addEventToGoogleCalendar(googleToken.access_token, {
         title: event.title,
         description: event.description,
         startTime,
         endTime,
       });
+
       alert("✅ Event added to your Google Calendar!");
     } catch (err) {
-      console.error(err);
+      console.error("Error adding event to Google Calendar:", err);
       alert("❌ Failed to add event to Google Calendar");
     }
   };
@@ -199,9 +213,16 @@ function IndividualEvent() {
   const imageUrl = event.image_url || DEFAULT_IMAGE_URL;
 
   const displayPrice = () => {
-    if (event.price_type === "free") return "Free";
-    if (event.price_type === "pay_what_you_feel") return "Pay What You Feel";
-    return `£${event.price.toFixed(2)}`;
+    switch (event.price_type) {
+      case "free":
+        return "Free";
+      case "pay-as-you-feel":
+        return "Pay What You Feel";
+      case "fixed":
+        return `£${Number(event.price).toFixed(2)}`;
+      default:
+        return "-";
+    }
   };
 
   return (
