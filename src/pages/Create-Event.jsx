@@ -5,8 +5,6 @@ import NavBar from "../components/NavBar/NavBar";
 import { useAuth } from "../custom-hooks/useAuth";
 import { supabase } from "../../supabaseClient";
 
-// ...imports remain the same
-
 function CreateEvent() {
   const navigate = useNavigate();
   const { session } = useAuth();
@@ -16,6 +14,7 @@ function CreateEvent() {
     event_date: "",
     location: "",
     location_description: "",
+    price_type: "free",
     price: "",
     description: "",
     activity_type: "",
@@ -51,7 +50,6 @@ function CreateEvent() {
     }
 
     let finalImageUrl = null;
-
     if (eventImage) {
       const fileExt = eventImage.name.split(".").pop();
       const fileName = `${Date.now()}-${Math.random()
@@ -77,6 +75,12 @@ function CreateEvent() {
       finalImageUrl = urlData.publicUrl;
     }
 
+    // Map price_type to database enum
+    let dbPriceType = formData.price_type;
+    if (formData.price_type === "pay-what-you-feel") {
+      dbPriceType = "pay-as-you-feel";
+    }
+
     const newEvent = {
       title: formData.title,
       description: formData.description,
@@ -84,8 +88,8 @@ function CreateEvent() {
       location_description: formData.location_description,
       event_date: formData.event_date,
       created_by: session.user.id,
-      price_type: formData.price > 0 ? "fixed" : "free",
-      price: parseFloat(formData.price) || 0,
+      price_type: dbPriceType,
+      price: dbPriceType === "fixed" ? parseFloat(formData.price) || 0 : 0,
       activity_type: formData.activity_type,
       capacity: parseInt(formData.capacity, 10) || null,
       image_url: finalImageUrl,
@@ -95,6 +99,7 @@ function CreateEvent() {
       .from("events")
       .insert([newEvent])
       .select();
+
     setLoading(false);
 
     if (error) {
@@ -121,7 +126,6 @@ function CreateEvent() {
           onSubmit={handleSubmit}
           className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl space-y-6"
         >
-          {/* Event Title */}
           <input
             type="text"
             name="title"
@@ -132,6 +136,7 @@ function CreateEvent() {
             required
           />
 
+          {/* Activity Type */}
           <div>
             <p className="text-xl font-semibold text-gray-700 mb-3">
               Activity Type:
@@ -157,6 +162,7 @@ function CreateEvent() {
             </div>
           </div>
 
+          {/* Date & Time */}
           <label className="block">
             <span className="text-lg font-medium text-gray-700">
               Date & Time:
@@ -171,10 +177,11 @@ function CreateEvent() {
             />
           </label>
 
+          {/* Location */}
           <input
             type="text"
             name="location"
-            placeholder="Event Location (e.g., The Roaches, Peak District)"
+            placeholder="Event Location"
             value={formData.location}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 text-lg transition"
@@ -184,45 +191,81 @@ function CreateEvent() {
           <textarea
             rows="3"
             name="location_description"
-            placeholder="Location Description - add more details about the venue, accessibility, or special notes..."
+            placeholder="Location Description"
             value={formData.location_description}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 text-lg transition"
           />
 
-          <div className="flex gap-4">
+          {/* Price Type */}
+          <div className="mb-4">
+            <p className="text-lg font-medium text-gray-700 mb-2">
+              Price Type:
+            </p>
+            <div className="flex gap-6">
+              {["free", "pay-what-you-feel", "fixed"].map((type) => (
+                <label
+                  key={type}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
+                  <input
+                    type="radio"
+                    name="price_type"
+                    value={type}
+                    checked={formData.price_type === type}
+                    onChange={handleChange}
+                    className="form-radio h-5 w-5 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                    required
+                  />
+                  {type === "free"
+                    ? "Free"
+                    : type === "pay-what-you-feel"
+                    ? "Pay What You Feel"
+                    : "Fixed Amount"}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {formData.price_type === "fixed" && (
             <input
               type="number"
               name="price"
-              placeholder="Price (0 for Free)"
+              placeholder="Enter price amount"
               value={formData.price}
               onChange={handleChange}
-              className="w-1/2 border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 text-lg transition"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 text-lg transition"
               min="0"
+              required
             />
-            <input
-              type="number"
-              name="capacity"
-              placeholder="Capacity (Max Attendees)"
-              value={formData.capacity}
-              onChange={handleChange}
-              className="w-1/2 border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 text-lg transition"
-              min="1"
-            />
-          </div>
+          )}
 
+          {/* Capacity */}
+          <input
+            type="number"
+            name="capacity"
+            placeholder="Capacity"
+            value={formData.capacity}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 text-lg transition"
+            min="1"
+            required
+          />
+
+          {/* Description */}
           <textarea
             rows="4"
             name="description"
-            placeholder="Detailed description of the event..."
+            placeholder="Detailed description"
             value={formData.description}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 text-lg transition"
           />
 
+          {/* Event Image */}
           <label className="block">
             <span className="text-lg font-medium text-gray-700">
-              Event Image (JPG/PNG - Optional):
+              Event Image (Optional):
             </span>
             <input
               type="file"

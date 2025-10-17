@@ -129,7 +129,7 @@ function EventCard({ event }) {
           <p>{event.location}</p>
         </div>
         <div className="flex flex-row justify-between">
-          <p>${event.price}</p>
+          <p>£{event.price}</p>
           <button
             onClick={(e) => {
               e.preventDefault();

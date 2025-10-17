@@ -62,22 +62,20 @@ function IndividualEvent() {
   const handleBookEvent = async () => {
     if (!session) {
       alert("You must be logged in to book an event!");
-      navigate("/login");
+      navigate("/signup-login");
       return;
     }
 
     setBookingStatus("loading");
 
     try {
-      // Step 1: Insert booking
       const { data: bookingData, error: bookingError } = await supabase
         .from("bookings")
         .insert([{ user_id: session.user.id, event_id: id, status: "pending" }])
-        .select(); // get the booking row back
+        .select();
 
       if (bookingError) throw bookingError;
 
-      // Step 2: Decrement event capacity atomically
       const { data: updatedEvent, error: eventError } = await supabase
         .from("events")
         .update({ capacity: event.capacity - 1 })
@@ -88,7 +86,6 @@ function IndividualEvent() {
 
       if (eventError) throw eventError;
 
-      // Update local state
       setEvent(updatedEvent);
       setBookingStatus("success");
       alert("🎉 Event successfully booked!");
@@ -201,6 +198,12 @@ function IndividualEvent() {
 
   const imageUrl = event.image_url || DEFAULT_IMAGE_URL;
 
+  const displayPrice = () => {
+    if (event.price_type === "free") return "Free";
+    if (event.price_type === "pay_what_you_feel") return "Pay What You Feel";
+    return `£${event.price.toFixed(2)}`;
+  };
+
   return (
     <>
       <NavBar />
@@ -278,11 +281,19 @@ function IndividualEvent() {
 
         <div className="w-full max-w-3xl flex flex-col gap-2">
           <h1 className="text-3xl font-bold">{event.title}</h1>
+          <p className="italic">{displayPrice()}</p>
           <p>{event.description}</p>
           <p className="mt-5 font-bold">Date & Time</p>
           <p>{format(new Date(event.event_date), "EEE, dd MMM yyy, HH:mm")}</p>
           <p className="mt-5 font-bold">Location - {event.location}</p>
           <p>{event.location_description}</p>
+          <p className="mt-20">
+            <em>
+              All payments are to be made in cash on the day of the event
+              because our developer ran out of time to integrate online
+              payments, but this seervice will be available soon!
+            </em>
+          </p>
         </div>
       </div>
 
