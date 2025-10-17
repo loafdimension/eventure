@@ -5,6 +5,8 @@ import NavBar from "../components/NavBar/NavBar";
 import { useAuth } from "../custom-hooks/useAuth";
 import { supabase } from "../../supabaseClient";
 
+// ...imports remain the same
+
 function CreateEvent() {
   const navigate = useNavigate();
   const { session } = useAuth();
@@ -13,6 +15,7 @@ function CreateEvent() {
     title: "",
     event_date: "",
     location: "",
+    location_description: "",
     price: "",
     description: "",
     activity_type: "",
@@ -50,35 +53,27 @@ function CreateEvent() {
     let finalImageUrl = null;
 
     if (eventImage) {
-
       const fileExt = eventImage.name.split(".").pop();
       const fileName = `${Date.now()}-${Math.random()
         .toString(36)
         .substring(2, 9)}.${fileExt}`;
       const filePath = `${session.user.id}/${fileName}`;
 
-
       const { error: uploadError } = await supabase.storage
-        .from("event_images") 
-        .upload(filePath, eventImage, {
-          cacheControl: "3600",
-          upsert: false,
-        });
+        .from("event_images")
+        .upload(filePath, eventImage, { cacheControl: "3600", upsert: false });
 
       if (uploadError) {
         console.error("Error uploading image:", uploadError);
-
         setEventImage(null);
         setError("Failed to upload image. Please try again.");
         setLoading(false);
         return;
       }
 
-
       const { data: urlData } = supabase.storage
-        .from("event_images") 
+        .from("event_images")
         .getPublicUrl(filePath);
-
       finalImageUrl = urlData.publicUrl;
     }
 
@@ -86,27 +81,26 @@ function CreateEvent() {
       title: formData.title,
       description: formData.description,
       location: formData.location,
+      location_description: formData.location_description,
       event_date: formData.event_date,
       created_by: session.user.id,
       price_type: formData.price > 0 ? "fixed" : "free",
       price: parseFloat(formData.price) || 0,
       activity_type: formData.activity_type,
       capacity: parseInt(formData.capacity, 10) || null,
-      image_url: finalImageUrl, 
+      image_url: finalImageUrl,
     };
 
     const { data, error } = await supabase
       .from("events")
       .insert([newEvent])
       .select();
-
     setLoading(false);
 
     if (error) {
       console.error("Error inserting event:", error);
       setError("Failed to create event. Check console for details.");
     } else {
-      console.log("Event created successfully:", data);
       alert("Event created successfully!");
       navigate("/");
     }
@@ -115,12 +109,9 @@ function CreateEvent() {
   return (
     <>
       <NavBar />
-
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {error && (
-          <div
-            className={`p-4 mb-6 rounded-xl shadow-md flex items-center gap-3 bg-red-100 text-red-700`}
-          >
+          <div className="p-4 mb-6 rounded-xl shadow-md flex items-center gap-3 bg-red-100 text-red-700">
             <AlertTriangle className="w-5 h-5" />
             <p>{error}</p>
           </div>
@@ -130,6 +121,7 @@ function CreateEvent() {
           onSubmit={handleSubmit}
           className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl space-y-6"
         >
+          {/* Event Title */}
           <input
             type="text"
             name="title"
@@ -189,6 +181,15 @@ function CreateEvent() {
             required
           />
 
+          <textarea
+            rows="3"
+            name="location_description"
+            placeholder="Location Description - add more details about the venue, accessibility, or special notes..."
+            value={formData.location_description}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 text-lg transition"
+          />
+
           <div className="flex gap-4">
             <input
               type="number"
@@ -225,8 +226,8 @@ function CreateEvent() {
             </span>
             <input
               type="file"
-              name="event_image" 
-              accept="image/jpeg, image/png" 
+              name="event_image"
+              accept="image/jpeg, image/png"
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-lg p-3 mt-1 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 text-lg transition"
             />
