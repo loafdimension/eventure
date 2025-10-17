@@ -4,6 +4,8 @@ import { supabase } from "../../../supabaseClient";
 import { useEvents } from "../../../context/EventsContext";
 import { useAuth } from "../../custom-hooks/useAuth";
 import { useState } from "react";
+import { shareEvent } from "../../utils/shareEvent";
+import ShareModal from "./ShareModal";
 
 const DEFAULT_IMAGE_URL = "/images/event-card-default.jpg";
 
@@ -11,6 +13,7 @@ function EventCard({ event }) {
   const { removeEvent } = useEvents();
   const { userRole } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const imageUrl = event.image_url || DEFAULT_IMAGE_URL;
 
@@ -28,7 +31,7 @@ function EventCard({ event }) {
     }
 
     alert("Event deleted successfully!");
-    removeEvent(event.id); 
+    removeEvent(event.id);
   };
 
   return (
@@ -66,8 +69,23 @@ function EventCard({ event }) {
         </div>
         <div className="flex flex-row justify-between">
           <p>${event.price}</p>
-          <button className="border rounded-lg p-1">share</button>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              shareEvent(event, () => setIsShareModalOpen(true));
+            }}
+            className="border rounded-lg p-1 hover:bg-gray-100 transition"
+          >
+            Share
+          </button>
         </div>
+
+        {isShareModalOpen && (
+          <ShareModal
+            event={event}
+            onClose={() => setIsShareModalOpen(false)}
+          />
+        )}
       </Link>
     </div>
   );

@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
 import { useAuth } from "../custom-hooks/useAuth";
 import { addEventToGoogleCalendar } from "../utils/googleCalendar";
+import { shareEvent } from "../utils/shareEvent";
+import ShareModal from "../components/Home/ShareModal";
 
 const DEFAULT_IMAGE_URL = "/images/event-card-default.jpg";
 
@@ -16,6 +18,7 @@ function IndividualEvent() {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [bookingStatus, setBookingStatus] = useState(null);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   useEffect(() => {
     async function fetchEvent() {
@@ -172,6 +175,15 @@ function IndividualEvent() {
             {bookingStatus === "success" ? (
               <>
                 <button
+                  onClick={() =>
+                    shareEvent(event, () => setIsShareModalOpen(true))
+                  }
+                  className="border rounded-lg px-4 py-2 bg-gray-200 hover:bg-gray-300 transition"
+                >
+                  Share
+                </button>
+
+                <button
                   onClick={handleCancelBooking}
                   className="border rounded-lg px-4 py-2 bg-red-600 text-white hover:bg-red-700 transition"
                 >
@@ -218,6 +230,9 @@ function IndividualEvent() {
           <p>{event.location_description}</p>
         </div>
       </div>
+      {isShareModalOpen && (
+        <ShareModal event={event} onClose={() => setIsShareModalOpen(false)} />
+      )}
     </>
   );
 }
