@@ -6,14 +6,15 @@ import { useAuth } from "../../custom-hooks/useAuth";
 import { useState } from "react";
 import { shareEvent } from "../../utils/shareEvent";
 import ShareModal from "./ShareModal";
-import { getActivityIcon } from "../../utils/getActivityIcon"; 
+import { getActivityIcon } from "../../utils/getActivityIcon";
 
 const DEFAULT_IMAGE_URL = "/images/event-card-default.jpg";
 
 function EventCard({ event }) {
   const { removeEvent } = useEvents();
-  const { userRole } = useAuth();
+  const { userRole, session } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [bookingLoading, setBookingLoading] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const imageUrl = event.image_url || DEFAULT_IMAGE_URL;
@@ -35,6 +36,45 @@ function EventCard({ event }) {
     removeEvent(event.id);
   };
 
+  const handleBookEvent = async () => {
+    if (!session) {
+      alert("You must be logged in to book an event!");
+      return;
+    }
+
+    if (event.capacity === 0) {
+      alert("❌ Event is fully booked!");
+      return;
+    }
+
+    setBookingLoading(true);
+    try {
+      const { error: bookingError } = await supabase
+        .from("bookings")
+        .insert([
+          { user_id: session.user.id, event_id: event.id, status: "pending" },
+        ]);
+
+      if (bookingError) throw bookingError;
+      const { data: updatedEvent, error: eventError } = await supabase
+        .from("events")
+        .update({ capacity: event.capacity - 1 })
+        .eq("id", event.id)
+        .select()
+        .single();
+
+      if (eventError) throw eventError;
+
+      alert("🎉 Event successfully booked!");
+      event.capacity = updatedEvent.capacity;
+    } catch (err) {
+      console.error(err);
+      alert("❌ Failed to book the event.");
+    } finally {
+      setBookingLoading(false);
+    }
+  };
+
   return (
     <div className="border-3 p-4 rounded-xl border-gray-400 relative hover:scale-105 transition-transform duration-200">
       {userRole === "admin" && (
@@ -44,6 +84,23 @@ function EventCard({ event }) {
           className="absolute top-2 left-2 px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition"
         >
           {loading ? "Deleting..." : "Delete"}
+        </button>
+      )}
+
+      {userRole === "user" && (
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            handleBookEvent();
+          }}
+          disabled={bookingLoading || event.capacity === 0}
+          className="absolute top-2 left-2 px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        >
+          {bookingLoading
+            ? "Booking..."
+            : event.capacity === 0
+            ? "Full"
+            : "Book Event"}
         </button>
       )}
 
@@ -58,7 +115,9 @@ function EventCard({ event }) {
 
         <div className="flex justify-between items-center mb-3">
           <div className="flex gap-2">
-            <p className="border rounded-lg p-1">{event.capacity} places left!</p>
+            <p className="border rounded-lg p-1">
+              {event.capacity} places left!
+            </p>
             <div className="border rounded-lg p-1 text-xl flex items-center justify-center">
               {getActivityIcon(event.activity_type)}
             </div>
