@@ -58,7 +58,7 @@ function EventCard({ event }) {
 
         <div className="flex justify-between items-center mb-3">
           <div className="flex gap-2">
-            <p className="border rounded-lg p-1">{event.capacity}</p>
+            <p className="border rounded-lg p-1">{event.capacity} places left!</p>
             <div className="border rounded-lg p-1 text-xl flex items-center justify-center">
               {getActivityIcon(event.activity_type)}
             </div>

@@ -7,7 +7,7 @@ import { useAuth } from "../custom-hooks/useAuth";
 import { addEventToGoogleCalendar } from "../utils/googleCalendar";
 import { shareEvent } from "../utils/shareEvent";
 import ShareModal from "../components/Home/ShareModal";
-import { getActivityIcon } from "../utils/getActivityIcon"; 
+import { getActivityIcon } from "../utils/getActivityIcon";
 
 const DEFAULT_IMAGE_URL = "/images/event-card-default.jpg";
 
@@ -36,14 +36,23 @@ function IndividualEvent() {
 
     async function checkBooking() {
       if (!session) return;
-      const { data } = await supabase
+
+      const { data, error } = await supabase
         .from("bookings")
         .select("*")
         .eq("user_id", session.user.id)
-        .eq("event_id", id)
-        .single();
+        .eq("event_id", id);
 
-      if (data) setBookingStatus("success");
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        setBookingStatus("success");
+      } else {
+        setBookingStatus(null);
+      }
     }
 
     fetchEvent();
@@ -58,50 +67,86 @@ function IndividualEvent() {
     }
 
     setBookingStatus("loading");
+
     try {
-      const { error } = await supabase
+      // Step 1: Insert booking
+      const { data: bookingData, error: bookingError } = await supabase
         .from("bookings")
-        .insert([
-          { user_id: session.user.id, event_id: id, status: "pending" },
-        ]);
-      if (error) throw error;
-      alert("🎉 Event successfully booked!");
+        .insert([{ user_id: session.user.id, event_id: id, status: "pending" }])
+        .select(); // get the booking row back
+
+      if (bookingError) throw bookingError;
+
+      // Step 2: Decrement event capacity atomically
+      const { data: updatedEvent, error: eventError } = await supabase
+        .from("events")
+        .update({ capacity: event.capacity - 1 })
+        .eq("id", id)
+        .gt("capacity", 0)
+        .select()
+        .single();
+
+      if (eventError) throw eventError;
+
+      // Update local state
+      setEvent(updatedEvent);
       setBookingStatus("success");
+      alert("🎉 Event successfully booked!");
     } catch (err) {
       console.error(err);
-      alert("❌ Failed to book the event.");
       setBookingStatus("error");
+      alert("❌ Failed to book the event.");
     }
   };
 
   const handleCancelBooking = async () => {
     if (!session) return;
+
     setBookingStatus("loading");
+
     try {
-      const { data: existingBookings, error } = await supabase
+      // Get the user's booking for this event
+      const { data: existingBookings, error: fetchError } = await supabase
         .from("bookings")
         .select("id")
         .eq("user_id", session.user.id)
         .eq("event_id", id);
-      if (error) throw error;
-      if (!existingBookings.length) {
+
+      if (fetchError) throw fetchError;
+
+      if (!existingBookings || existingBookings.length === 0) {
         alert("No booking found.");
         setBookingStatus(null);
         return;
       }
 
+      const bookingId = existingBookings[0].id;
+
+      // Delete the booking
       const { error: deleteError } = await supabase
         .from("bookings")
         .delete()
-        .eq("id", existingBookings[0].id);
+        .eq("id", bookingId);
+
       if (deleteError) throw deleteError;
 
-      alert("🚫 Booking cancelled successfully.");
+      // Safely increment the event capacity
+      const { data: updatedEvent, error: eventError } = await supabase
+        .from("events")
+        .update({ capacity: event.capacity + 1 })
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (eventError) throw eventError;
+
+      setEvent(updatedEvent);
       setBookingStatus(null);
+      alert("🚫 Booking cancelled successfully.");
     } catch (err) {
       console.error(err);
-      alert("❌ Failed to cancel booking.");
       setBookingStatus("error");
+      alert("❌ Failed to cancel booking.");
     }
   };
 
@@ -168,7 +213,9 @@ function IndividualEvent() {
 
         <div className="w-full max-w-3xl flex justify-between items-center mb-4 gap-4">
           <div className="flex gap-2">
-            <p className="border rounded-lg p-1">{event.capacity}</p>
+            <p className="border rounded-lg p-1">
+              {event.capacity} places left!
+            </p>
             <div className="border rounded-lg p-1 text-2xl flex items-center justify-center">
               {getActivityIcon(event.activity_type)}
             </div>
@@ -192,6 +239,7 @@ function IndividualEvent() {
                 >
                   Cancel Booking
                 </button>
+
                 <button
                   onClick={handleAddToGoogleCalendar}
                   className="border rounded-lg px-4 py-2 bg-green-600 text-white hover:bg-green-700 transition"
@@ -202,14 +250,18 @@ function IndividualEvent() {
             ) : (
               <button
                 onClick={handleBookEvent}
-                disabled={bookingStatus === "loading"}
+                disabled={bookingStatus === "loading" || event.capacity === 0}
                 className={`border rounded-lg px-4 py-2 transition ${
-                  bookingStatus === "loading"
+                  bookingStatus === "loading" || event.capacity === 0
                     ? "bg-gray-400 text-white cursor-not-allowed"
                     : "bg-blue-600 text-white hover:bg-blue-700"
                 }`}
               >
-                {bookingStatus === "loading" ? "Processing..." : "Book Event"}
+                {event.capacity === 0
+                  ? "Event Fully Booked"
+                  : bookingStatus === "loading"
+                  ? "Processing..."
+                  : "Book Event"}
               </button>
             )}
 
@@ -233,6 +285,7 @@ function IndividualEvent() {
           <p>{event.location_description}</p>
         </div>
       </div>
+
       {isShareModalOpen && (
         <ShareModal event={event} onClose={() => setIsShareModalOpen(false)} />
       )}
