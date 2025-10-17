@@ -122,7 +122,6 @@ function EventCard({ event }) {
               {getActivityIcon(event.activity_type)}
             </div>
           </div>
-          <p>weather</p>
         </div>
         <div className="flex flex-col mb-5">
           <p>{event.title}</p>
