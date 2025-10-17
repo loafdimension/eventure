@@ -6,6 +6,7 @@ import { useAuth } from "../../custom-hooks/useAuth";
 import { useState } from "react";
 import { shareEvent } from "../../utils/shareEvent";
 import ShareModal from "./ShareModal";
+import { getActivityIcon } from "../../utils/getActivityIcon"; 
 
 const DEFAULT_IMAGE_URL = "/images/event-card-default.jpg";
 
@@ -58,7 +59,9 @@ function EventCard({ event }) {
         <div className="flex justify-between items-center mb-3">
           <div className="flex gap-2">
             <p className="border rounded-lg p-1">{event.capacity}</p>
-            <p className="border rounded-lg p-1">{event.activity_type}</p>
+            <div className="border rounded-lg p-1 text-xl flex items-center justify-center">
+              {getActivityIcon(event.activity_type)}
+            </div>
           </div>
           <p>weather</p>
         </div>

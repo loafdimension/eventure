@@ -7,6 +7,7 @@ import { useAuth } from "../custom-hooks/useAuth";
 import { addEventToGoogleCalendar } from "../utils/googleCalendar";
 import { shareEvent } from "../utils/shareEvent";
 import ShareModal from "../components/Home/ShareModal";
+import { getActivityIcon } from "../utils/getActivityIcon"; 
 
 const DEFAULT_IMAGE_URL = "/images/event-card-default.jpg";
 
@@ -168,7 +169,9 @@ function IndividualEvent() {
         <div className="w-full max-w-3xl flex justify-between items-center mb-4 gap-4">
           <div className="flex gap-2">
             <p className="border rounded-lg p-1">{event.capacity}</p>
-            <p className="border rounded-lg p-1">{event.activity_type}</p>
+            <div className="border rounded-lg p-1 text-2xl flex items-center justify-center">
+              {getActivityIcon(event.activity_type)}
+            </div>
           </div>
 
           <div className="flex gap-3 items-center">
