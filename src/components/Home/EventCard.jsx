@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "../../../supabaseClient";
 import { useEvents } from "../../../context/EventsContext";
 import { useAuth } from "../../custom-hooks/useAuth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { shareEvent } from "../../utils/shareEvent";
 import ShareModal from "./ShareModal";
 import { getActivityIcon } from "../../utils/getActivityIcon";
@@ -14,11 +14,34 @@ const DEFAULT_IMAGE_URL = "/images/event-card-default.jpg";
 function EventCard({ event }) {
   const { removeEvent } = useEvents();
   const { userRole, session } = useAuth();
+
   const [loading, setLoading] = useState(false);
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [isBooked, setIsBooked] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const imageUrl = event.image_url || DEFAULT_IMAGE_URL;
+
+  useEffect(() => {
+    async function checkIfBooked() {
+      if (!session) return;
+      const { data, error } = await supabase
+        .from("bookings")
+        .select("id")
+        .eq("user_id", session.user.id)
+        .eq("event_id", event.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Booking check error:", error);
+        return;
+      }
+
+      if (data) setIsBooked(true);
+    }
+
+    checkIfBooked();
+  }, [session, event.id]);
 
   const handleDeleteEvent = async () => {
     if (!confirm("Are you sure you want to delete this event?")) return;
@@ -43,6 +66,11 @@ function EventCard({ event }) {
       return;
     }
 
+    if (isBooked) {
+      alert("✅ You’ve already booked this event.");
+      return;
+    }
+
     if (event.capacity === 0) {
       alert("❌ Event is fully booked!");
       return;
@@ -50,6 +78,18 @@ function EventCard({ event }) {
 
     setBookingLoading(true);
     try {
+      const { data: existingBooking } = await supabase
+        .from("bookings")
+        .select("id")
+        .eq("user_id", session.user.id)
+        .eq("event_id", event.id);
+
+      if (existingBooking && existingBooking.length > 0) {
+        alert("✅ You’ve already booked this event.");
+        setIsBooked(true);
+        return;
+      }
+
       const { error: bookingError } = await supabase
         .from("bookings")
         .insert([
@@ -57,6 +97,7 @@ function EventCard({ event }) {
         ]);
 
       if (bookingError) throw bookingError;
+
       const { data: updatedEvent, error: eventError } = await supabase
         .from("events")
         .update({ capacity: event.capacity - 1 })
@@ -68,6 +109,7 @@ function EventCard({ event }) {
 
       alert("🎉 Event successfully booked!");
       event.capacity = updatedEvent.capacity;
+      setIsBooked(true);
     } catch (err) {
       console.error(err);
       alert("❌ Failed to book the event.");
@@ -94,10 +136,20 @@ function EventCard({ event }) {
             e.preventDefault();
             handleBookEvent();
           }}
-          disabled={bookingLoading || event.capacity === 0}
-          className="absolute top-2 left-2 px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+          disabled={bookingLoading || event.capacity === 0 || isBooked}
+          className={`absolute top-2 left-2 px-2 py-1 text-xs text-white rounded transition ${
+            isBooked
+              ? "bg-green-600 cursor-not-allowed"
+              : bookingLoading
+              ? "bg-gray-400"
+              : event.capacity === 0
+              ? "bg-gray-500 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
         >
-          {bookingLoading
+          {isBooked
+            ? "Booked"
+            : bookingLoading
             ? "Booking..."
             : event.capacity === 0
             ? "Full"
@@ -124,11 +176,13 @@ function EventCard({ event }) {
             </div>
           </div>
         </div>
+
         <div className="flex flex-col mb-5">
           <p>{event.title}</p>
           <p>{format(new Date(event.event_date), "EEE, dd MMM yyy, HH:mm")}</p>
           <p>{event.location}</p>
         </div>
+
         <div className="flex flex-row justify-between">
           <p className="italic">
             {displayPrice(event.price_type, event.price)}
