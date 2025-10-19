@@ -1,21 +1,61 @@
-<<<<<<< HEAD
-# eventure
-The Repository for Tech Returners Freelance Project
-=======
-# React + Vite
+# Welcome to Eventure! 🏃‍♂️🏞️🧗‍♀️
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Table of Contents 📚
 
-Currently, two official plugins are available:
+- [About](#about)  
+- [Live Demo](#live-demo)  
+- [How to Install and Run](#how-to-install-and-run)  
+- [Features](#features)  
+- [Tech Stack](#tech-stack)  
+- [Future Features](#future-features)  
+- [Login Information](#login-information)  
+- [Feedback](#feedback)  
+- [Credits](#credits)  
+- [Contact](#contact)  
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+<a id="about"></a>
 
-The React Compiler is not enabled on this template. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# About 📝
 
-## Expanding the ESLint configuration
+**What is Eventure?**
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
->>>>>>> afbf051 (Installing tailwind and editting the vite config, installing react router, installling axios, creating my environment variables and creating my supabase client)
+Eventure is an events platform project designed for a small community business to create and share events with members. Events are typically walking, running, swimming, or climbing activities.  
+
+- **Admin users** can create and delete events, and see all the events they have created under the *My Events* section.  
+- **Regular users** can book events, which adds them to their personal calendar on the website. If logged in via Google, users can also add events to their Google Calendar.  
+
+**Important Note:**  
+The Google Calendar integration uses a sensitive API scope. The app is currently on a Google test account, so only test users that you add via the Google Cloud Console can access this feature.
+
+**Backend & Authentication:**  
+Eventure uses Supabase for authentication, database management, and backend logic.
+
+---
+
+<a id="live-demo"></a>
+
+# Live Demo ✨
+
+Experience the hosted version of Eventure here:
+
+- **[Eventure Hosted Site (Netlify)](https://eventureproject.netlify.app/)**
+
+---
+
+<a id="how-to-install-and-run"></a>
+
+# How to Install and Run 🚀
+
+Follow these steps to get a local copy of Eventure running on your machine.
+
+**1 - Prerequisites**
+
+- **Node.js** and **npm** installed (comes with Node.js).  
+- **Supabase account** (for connecting to your own instance if desired).
+
+**2 - Clone the Repository**
+
+```bash
+git clone https://github.com/loafdimension/eventure.git
