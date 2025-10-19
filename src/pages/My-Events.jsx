@@ -10,17 +10,25 @@ function MyEvents() {
   const { session } = useAuth();
   const [bookedEvents, setBookedEvents] = useState([]);
   const [hoverDate, setHoverDate] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function fetchBookedEvents() {
       if (!session) return;
 
-      const { data } = await supabase
-        .from("bookings")
-        .select(`events(*)`)
-        .eq("user_id", session.user.id);
+      setLoading(true);
+      setError(null);
 
-      if (data) {
+      try {
+        const { data, error } = await supabase
+          .from("bookings")
+          .select(`events(*)`)
+          .eq("user_id", session.user.id)
+          .order("booked_at", { ascending: true });
+
+        if (error) throw error;
+
         const formatted = data
           .map((b) => b.events)
           .filter(Boolean)
@@ -28,10 +36,20 @@ function MyEvents() {
             id: e.id,
             title: e.title,
             start: new Date(e.event_date),
-            end: new Date(new Date(e.event_date).getTime() + 60 * 60 * 1000), 
+            end: new Date(new Date(e.event_date).getTime() + 60 * 60 * 1000),
+            event_date: e.event_date,
+            location: e.location,
+            event_type: e.event_type,
+            description: e.description,
           }));
 
+        console.log("✅ MyEvents - formatted booked events:", formatted);
         setBookedEvents(formatted);
+      } catch (err) {
+        console.error("Error fetching booked events:", err);
+        setError("Failed to load booked events. Please try again.");
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -46,11 +64,20 @@ function MyEvents() {
           <p className="text-3xl font-bold mb-4 w-full text-center">
             upcoming events
           </p>
-          <EventsRow onHoverDate={setHoverDate} />
+
+          {loading ? (
+            <p className="text-lg text-gray-600">Loading your events...</p>
+          ) : error ? (
+            <p className="text-red-600">{error}</p>
+          ) : (
+            <EventsRow onHoverDate={setHoverDate} events={bookedEvents} />
+          )}
+
           <div className="mt-6 flex justify-center w-full">
             <BookMoreEvents />
           </div>
         </div>
+
         <div className="lg:w-2/4 mt-10 lg:mt-0">
           <EventCalendar bookedEvents={bookedEvents} hoverDate={hoverDate} />
         </div>
