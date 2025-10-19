@@ -7,6 +7,7 @@ import { useState } from "react";
 import { shareEvent } from "../../utils/shareEvent";
 import ShareModal from "./ShareModal";
 import { getActivityIcon } from "../../utils/getActivityIcon";
+import { displayPrice } from "../../utils/displayPrice";
 
 const DEFAULT_IMAGE_URL = "/images/event-card-default.jpg";
 
@@ -129,7 +130,9 @@ function EventCard({ event }) {
           <p>{event.location}</p>
         </div>
         <div className="flex flex-row justify-between">
-          <p>£{event.price}</p>
+          <p className="italic">
+            {displayPrice(event.price_type, event.price)}
+          </p>
           <button
             onClick={(e) => {
               e.preventDefault();

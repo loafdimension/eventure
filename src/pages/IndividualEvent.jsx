@@ -8,6 +8,7 @@ import { addEventToGoogleCalendar } from "../utils/googleCalendar";
 import { shareEvent } from "../utils/shareEvent";
 import ShareModal from "../components/Home/ShareModal";
 import { getActivityIcon } from "../utils/getActivityIcon";
+import { displayPrice } from "../utils/displayPrice";
 
 const DEFAULT_IMAGE_URL = "/images/event-card-default.jpg";
 
@@ -160,7 +161,6 @@ function IndividualEvent() {
   };
 
   const handleAddToGoogleCalendar = async () => {
-
     if (!session) {
       alert("You must be logged in to add events to Google Calendar!");
       return;
@@ -215,19 +215,6 @@ function IndividualEvent() {
     );
 
   const imageUrl = event.image_url || DEFAULT_IMAGE_URL;
-
-  const displayPrice = () => {
-    switch (event.price_type) {
-      case "free":
-        return "Free";
-      case "pay-as-you-feel":
-        return "Pay What You Feel";
-      case "fixed":
-        return `£${Number(event.price).toFixed(2)}`;
-      default:
-        return "-";
-    }
-  };
 
   return (
     <>
@@ -306,7 +293,9 @@ function IndividualEvent() {
 
         <div className="w-full max-w-3xl flex flex-col gap-2">
           <h1 className="text-3xl font-bold">{event.title}</h1>
-          <p className="italic">{displayPrice()}</p>
+          <p className="italic">
+            {displayPrice(event.price_type, event.price)}
+          </p>
           <p>{event.description}</p>
           <p className="mt-5 font-bold">Date & Time</p>
           <p>{format(new Date(event.event_date), "EEE, dd MMM yyy, HH:mm")}</p>
