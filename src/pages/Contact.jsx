@@ -20,7 +20,7 @@ function Contact() {
 
           <div className="max-w-3xl">
             <h1 className="text-5xl font-semibold mb-6 text-center mt-20">
-              How can we help?
+              How can we help APPLE TEST?
             </h1>
             <p className="text-lg text-gray-700 mb-8 leading-relaxed text-center">
               We’re here to help! Whether you have questions about upcoming
