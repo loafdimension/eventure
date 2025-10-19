@@ -17,6 +17,7 @@ function SignUpLogInForm() {
         appearance={{ theme: ThemeSupa }}
         providers={["google"]}
         view="sign_up"
+        redirectTo={window.location.origin} 
         providerScopes={{
           google: requiredScopes,
         }}
