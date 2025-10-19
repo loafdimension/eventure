@@ -59,3 +59,8 @@ Follow these steps to get a local copy of Eventure running on your machine.
 
 ```bash
 git clone https://github.com/loafdimension/eventure.git
+
+**3 - Navigate to the Project Directory**
+
+```bash
+cd eventure
