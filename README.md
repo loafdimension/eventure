@@ -23,11 +23,11 @@
 
 Eventure is an events platform project designed for a small community business to create and share events with members. Events are typically walking, running, swimming, or climbing activities.  
 
-- **Admin users** can create and delete events, and see all the events they have created under the *My Events* section.  
+- **Admin users** can create and delete events, and see all the events they have created under the *My Events & Calendar* section.  
 - **Regular users** can book events, which adds them to their personal calendar on the website. If logged in via Google, users can also add events to their Google Calendar.  
 
 **Important Note:**  
-The Google Calendar integration uses a sensitive API scope. The app is currently on a Google test account, so only test users that you add via the Google Cloud Console can access this feature.
+The Google Calendar integration uses a sensitive API scope. The app is currently on a Google test account, so only test users that I add via the Google Cloud Console can access this feature.
 
 **Backend & Authentication:**  
 Eventure uses Supabase for authentication, database management, and backend logic.
@@ -53,7 +53,6 @@ Follow these steps to get a local copy of Eventure running on your machine.
 **1 - Prerequisites**
 
 - **Node.js** and **npm** installed (comes with Node.js).  
-- **Supabase account** (for connecting to your own instance if desired).
 
 **2 - Clone the Repository**
 
@@ -91,7 +90,7 @@ npm run dev
 - **Google Calendar Integration:** Add booked events to Google Calendar (only for authorized test users).  
 - **Admin Features:** Create, update, and delete events. View all events you’ve created.  
 - **Live Capacity Tracking:** See remaining spots for each event in real-time.  
-- **Activity Icons & Transitions:** Each event displays an activity icon with smooth visual transitions.  
+- **Activity Icons & Transitions:** Activity icons at the top of the page change the image below.  
 
 ---
 
@@ -99,7 +98,7 @@ npm run dev
 
 # Tech Stack 💻
 
-- **Front-end:** React.js + Vite  
+- **Front-end:** React + Vite  
 - **Styling:** Tailwind CSS  
 - **State Management:** React hooks (useState, useEffect)  
 - **Routing:** React Router DOM  
@@ -140,10 +139,9 @@ For testing purposes, you can use the following accounts:
 
 # Feedback 🤝
 
-Feedback is welcome! Please use GitHub Discussions or Issues to share your thoughts. Contributions are not required at this time.  
+Feedback is welcome! Please use GitHub Discussions or Issues to share your thoughts. 
 
 - [Issues](https://github.com/loafdimension/eventure/issues)  
-- [Discussions](https://github.com/loafdimension/eventure/discussions)
 
 ---
 
@@ -152,7 +150,7 @@ Feedback is welcome! Please use GitHub Discussions or Issues to share your thoug
 # Credits 🎥
 
 **Development:** Morgan Hewitt  
-**Support / Inspiration:** Northcoders & Tech Returners  
+**Thanks:** Northcoders & Tech Returners  
 
 ---
 
@@ -161,4 +159,4 @@ Feedback is welcome! Please use GitHub Discussions or Issues to share your thoug
 # Contact 📞
 
 - [LinkedIn](https://www.linkedin.com/in/morgan-hewitt-8a68041ab/)  
-- [GitHub](https://github.com/loafdimension/eventure)
+- [GitHub](https://github.com/loafdimension)
