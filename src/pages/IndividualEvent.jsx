@@ -102,7 +102,6 @@ function IndividualEvent() {
     setBookingStatus("loading");
 
     try {
-      // Get the user's booking for this event
       const { data: existingBookings, error: fetchError } = await supabase
         .from("bookings")
         .select("id")
@@ -161,26 +160,31 @@ function IndividualEvent() {
   };
 
   const handleAddToGoogleCalendar = async () => {
+
     if (!session) {
       alert("You must be logged in to add events to Google Calendar!");
       return;
     }
 
-    const googleToken =
-      session.provider_token || session.user?.app_metadata?.provider_token;
+    const {
+      data: { session: latestSession },
+    } = await supabase.auth.getSession();
 
-    if (!googleToken || !googleToken.access_token) {
+    const googleAccessToken =
+      latestSession?.provider_token || latestSession?.access_token;
+
+    if (!googleAccessToken) {
       alert("Please connect your Google account first!");
       return;
     }
 
-    try {
-      const startTime = new Date(event.event_date).toISOString();
-      const endTime = new Date(
-        new Date(event.event_date).getTime() + 60 * 60 * 1000
-      ).toISOString();
+    const startTime = new Date(event.event_date).toISOString();
+    const endTime = new Date(
+      new Date(event.event_date).getTime() + 60 * 60 * 1000
+    ).toISOString();
 
-      await addEventToGoogleCalendar(googleToken.access_token, {
+    try {
+      await addEventToGoogleCalendar(googleAccessToken, {
         title: event.title,
         description: event.description,
         startTime,
@@ -188,8 +192,8 @@ function IndividualEvent() {
       });
 
       alert("✅ Event added to your Google Calendar!");
-    } catch (err) {
-      console.error("Error adding event to Google Calendar:", err);
+    } catch (error) {
+      console.error("Error adding event:", error);
       alert("❌ Failed to add event to Google Calendar");
     }
   };
