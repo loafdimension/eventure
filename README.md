@@ -26,8 +26,9 @@ Eventure is an events platform project designed for a small community business t
 - **Admin users** can create and delete events, and see all the events they have created under the *My Events & Calendar* section.  
 - **Regular users** can book events, which adds them to their personal calendar on the website. If logged in via Google, users can also add events to their Google Calendar.  
 
-**Important Note:**  
-The Google Calendar integration uses a sensitive API scope. The app is currently on a Google test account, so only test users that I add via the Google Cloud Console can access this feature.
+**Important Notes:**  
+- The Google Calendar integration uses a sensitive API scope. The app is currently on a Google test account, so only test users that I add via the Google Cloud Console can access this feature.
+- Supabase will "pause the project" if not used after 30 days so if the backend isn't loading, contact me and I will unpause it.
 
 **Backend & Authentication:**  
 Eventure uses Supabase for authentication, database management, and backend logic.
