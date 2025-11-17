@@ -59,16 +59,21 @@ function MyEvents() {
   return (
     <>
       <NavBar />
-      <div className="flex flex-col lg:flex-row p-10">
+      <div className="flex flex-col lg:flex-row gap-8 p-4 sm:p-6 md:p-10">
+        {/* Left: Events row */}
         <div className="lg:w-2/4 flex flex-col items-center">
-          <p className="text-3xl font-bold mb-4 w-full text-center">
-            upcoming events
+          <p className="text-2xl sm:text-3xl font-bold mb-4 w-full text-center">
+            Upcoming Events
           </p>
 
           {loading ? (
-            <p className="text-lg text-gray-600">Loading your events...</p>
+            <p className="text-lg text-gray-600 text-center">
+              Loading your events...
+            </p>
           ) : error ? (
-            <p className="text-red-600">{error}</p>
+            <p className="text-red-600 text-center">{error}</p>
+          ) : bookedEvents.length === 0 ? (
+            <p className="text-gray-600 text-center">No booked events yet.</p>
           ) : (
             <EventsRow onHoverDate={setHoverDate} events={bookedEvents} />
           )}
@@ -78,7 +83,8 @@ function MyEvents() {
           </div>
         </div>
 
-        <div className="lg:w-2/4 mt-10 lg:mt-0">
+        {/* Right: Calendar */}
+        <div className="lg:w-2/4 w-full mt-6 lg:mt-0">
           <EventCalendar bookedEvents={bookedEvents} hoverDate={hoverDate} />
         </div>
       </div>
