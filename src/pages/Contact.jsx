@@ -38,9 +38,9 @@ function Contact() {
             </div>
           </div>
         </div>
-
+   
         <div className="flex-1 flex justify-center items-center mt-8 md:mt-0">
-          <div className="bg-white shadow-lg rounded-2xl p-6 sm:p-12 w-full max-w-lg">
+          <div className="bg-white shadow-lg rounded-2xl w-full px-4 sm:px-6 md:px-12 py-6 sm:py-8 max-w-lg">
             <form className="flex flex-col gap-4 sm:gap-6">
               <div className="flex flex-col sm:flex-row gap-4">
                 <input
@@ -69,7 +69,7 @@ function Contact() {
 
               <button
                 type="submit"
-                className="bg-blue-600 text-white font-medium py-3 px-6 rounded-lg hover:bg-blue-700 text-base sm:text-lg transition"
+                className="bg-blue-600 text-white font-medium py-3 px-6 rounded-lg hover:bg-blue-700 text-base sm:text-lg transition w-full sm:w-auto"
               >
                 Send Message
               </button>
