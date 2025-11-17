@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react"; 
+import { Menu, X } from "lucide-react";
 import Logo from "./Logo";
 import ActivityButtons from "./ActivityButtons";
 import NavBarButtons from "./NavBarButtons";
@@ -46,11 +46,7 @@ function NavBar({ onHoverChange, onHoverLeave }) {
       {isOpen && (
         <div className="md:hidden bg-white shadow-md border-t border-gray-200">
           <div className="px-4 pt-4 pb-6 space-y-4 flex flex-col items-start">
-            <ActivityButtons
-              onHoverChange={isHomePage ? onHoverChange : undefined}
-              onHoverLeave={isHomePage ? onHoverLeave : undefined}
-            />
-            <NavBarButtons />
+            <NavBarButtons vertical onLinkClick={() => setIsOpen(false)} />
           </div>
         </div>
       )}
