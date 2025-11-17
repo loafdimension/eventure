@@ -7,7 +7,7 @@ function ActivityButtons({ onHoverChange, onHoverLeave }) {
   const isHomePage = location.pathname === "/";
 
   return (
-    <div className="flex gap-8 md:gap-12 p-2 md:p-4 justify-center">
+    <div className="flex gap-8 md:gap-12 p-2 md:p-4 justify-center ml-10 mr-50">
       <FaWalking
         className="text-3xl sm:text-4xl hover:text-indigo-600 transition-colors"
         onMouseEnter={

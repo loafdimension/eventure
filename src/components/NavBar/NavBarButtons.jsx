@@ -26,7 +26,7 @@ function NavBarButtons({ vertical = false, onLinkClick }) {
   return (
     <div
       className={`flex ${
-        vertical ? "flex-col items-start gap-8" : "flex-row items-center gap-8"
+        vertical ? "flex-col items-start gap-8" : "flex-row items-center gap-28"
       }`}
     >
       {isAuthenticated && userRole === "admin" && (
@@ -45,7 +45,7 @@ function NavBarButtons({ vertical = false, onLinkClick }) {
           className="hover:text-indigo-600 text-lg sm:text-xl"
           onClick={onLinkClick}
         >
-          My Events & Calendar
+          My Events
         </Link>
       )}
 
