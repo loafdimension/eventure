@@ -11,28 +11,28 @@ function ActivityButtons({ onHoverChange, onHoverLeave }) {
   return (
     <div className="flex gap-20 p-6 ml-15">
       <FaWalking
-        className="text-4xl cursor-pointer hover:text-indigo-600 transition-colors"
+        className="text-4xl hover:text-indigo-600 transition-colors"
         onMouseEnter={
           isHomePage ? () => onHoverChange("images/walking.jpg") : undefined
         }
         onMouseLeave={isHomePage ? onHoverLeave : undefined}
       />
       <FaRunning
-        className="text-4xl cursor-pointer hover:text-indigo-600 transition-colors"
+        className="text-4xl hover:text-indigo-600 transition-colors"
         onMouseEnter={
           isHomePage ? () => onHoverChange("images/running.jpg") : undefined
         }
         onMouseLeave={isHomePage ? onHoverLeave : undefined}
       />
       <GiMountainClimbing
-        className="text-4xl cursor-pointer hover:text-indigo-600 transition-colors"
+        className="text-4xl hover:text-indigo-600 transition-colors"
         onMouseEnter={
           isHomePage ? () => onHoverChange("images/climbing.jpg") : undefined
         }
         onMouseLeave={isHomePage ? onHoverLeave : undefined}
       />
       <FaSwimmer
-        className="text-4xl cursor-pointer hover:text-indigo-600 transition-colors"
+        className="text-4xl hover:text-indigo-600 transition-colors"
         onMouseEnter={
           isHomePage ? () => onHoverChange("images/swimming.jpg") : undefined
         }
