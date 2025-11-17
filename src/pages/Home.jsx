@@ -14,7 +14,7 @@ function Home() {
         onHoverLeave={() => setCurrentImage("/images/default.jpg")}
       />
 
-      <main className="flex-grow flex flex-col items-center bg-gray-50 px-4 sm:px-6 lg:px-10 py-6 sm:py-10">
+      <main className="fflex-grow flex flex-col items-center bg-gray-50 px-4 sm:px-6 lg:px-10 py-6 sm:py-10 pt-24 sm:pt-32">
         <div className="w-full max-w-4xl aspect-video relative mb-6 sm:mb-10">
           <AnimatePresence mode="wait">
             <motion.img

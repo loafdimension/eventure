@@ -60,7 +60,6 @@ function MyEvents() {
     <>
       <NavBar />
       <div className="flex flex-col lg:flex-row gap-8 p-4 sm:p-6 md:p-10">
-        {/* Left: Events row */}
         <div className="lg:w-2/4 flex flex-col items-center">
           <p className="text-2xl sm:text-3xl font-bold mb-4 w-full text-center">
             Upcoming Events
@@ -83,7 +82,6 @@ function MyEvents() {
           </div>
         </div>
 
-        {/* Right: Calendar */}
         <div className="lg:w-2/4 w-full mt-6 lg:mt-0">
           <EventCalendar bookedEvents={bookedEvents} hoverDate={hoverDate} />
         </div>

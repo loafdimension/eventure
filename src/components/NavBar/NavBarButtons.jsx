@@ -1,14 +1,14 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../custom-hooks/useAuth";
 
-function NavBarButtons() {
+function NavBarButtons({ vertical = false, onLinkClick }) {
   const { isAuthenticated, signOut, userRole, loading } = useAuth();
-
   const navigate = useNavigate();
 
   const handleSignOut = () => {
     signOut();
     navigate("/");
+    if (onLinkClick) onLinkClick(); 
   };
 
   const handleScrollToEvents = () => {
@@ -17,58 +17,63 @@ function NavBarButtons() {
       if (section) {
         section.scrollIntoView({ behavior: "smooth" });
       }
+      if (onLinkClick) onLinkClick(); 
     }, 100);
   };
 
-  if (loading) {
-    // return a loading spinner here later
-    return <div className="p-4">Loading navigation...</div>;
-  }
+  if (loading) return <div className="p-2 text-center">Loading...</div>;
 
   return (
-    <nav className="w-full">
-      <div className="flex flex-row items-center justify-between w-full px-10">
-        <div className="flex flex-row gap-25 ml-25">
-          {isAuthenticated && userRole === "admin" && (
-            <Link to="/create-event" className="hover:text-indigo-600 text-xl">
-              Create Event
-            </Link>
-          )}
+    <div
+      className={`flex ${
+        vertical ? "flex-col items-start gap-8" : "flex-row items-center gap-8"
+      }`}
+    >
+      {isAuthenticated && userRole === "admin" && (
+        <Link
+          to="/create-event"
+          className="hover:text-indigo-600 text-lg sm:text-xl"
+          onClick={onLinkClick}
+        >
+          Create Event
+        </Link>
+      )}
 
-          {isAuthenticated && (
-            <Link to="/my-events" className="hover:text-indigo-600 text-xl">
-              My Events & Calendar
-            </Link>
-          )}
+      {isAuthenticated && (
+        <Link
+          to="/my-events"
+          className="hover:text-indigo-600 text-lg sm:text-xl"
+          onClick={onLinkClick}
+        >
+          My Events & Calendar
+        </Link>
+      )}
 
-          <Link
-            to="/#events-section"
-            onClick={handleScrollToEvents}
-            className="hover:text-indigo-600 text-xl"
-          >
-            Find Event
-          </Link>
-        </div>
+      <Link
+        to="/#events-section"
+        onClick={handleScrollToEvents}
+        className="hover:text-indigo-600 text-lg sm:text-xl"
+      >
+        Find Event
+      </Link>
 
-        <div className="flex flex-row">
-          {isAuthenticated ? (
-            <button
-              onClick={handleSignOut}
-              className="hover:text-indigo-600 font-semibold text-xl"
-            >
-              Sign Out
-            </button>
-          ) : (
-            <Link
-              to="/signup-login"
-              className="hover:text-indigo-600 font-semibold text-xl"
-            >
-              Sign In
-            </Link>
-          )}
-        </div>
-      </div>
-    </nav>
+      {isAuthenticated ? (
+        <button
+          onClick={handleSignOut}
+          className="hover:text-indigo-600 font-semibold text-lg sm:text-xl"
+        >
+          Sign Out
+        </button>
+      ) : (
+        <Link
+          to="/signup-login"
+          className="hover:text-indigo-600 font-semibold text-lg sm:text-xl"
+          onClick={onLinkClick}
+        >
+          Sign In
+        </Link>
+      )}
+    </div>
   );
 }
 
