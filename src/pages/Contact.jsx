@@ -10,7 +10,7 @@ function Contact() {
 
       <div className="flex flex-col md:flex-row items-start px-10 py-16 gap-10">
         <div className="flex flex-col items-start flex-1">
-          <div className="w-full max-w-3xl h-80 relative mb-10">
+          <div className="w-full max-w-4xl aspect-video relative mb-6 sm:mb-10">
             <img
               src={image}
               alt="Contact banner"

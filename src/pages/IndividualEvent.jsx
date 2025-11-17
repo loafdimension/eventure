@@ -119,7 +119,6 @@ function IndividualEvent() {
 
       const bookingId = existingBookings[0].id;
 
-      // Delete the booking
       const { error: deleteError } = await supabase
         .from("bookings")
         .delete()
@@ -127,7 +126,6 @@ function IndividualEvent() {
 
       if (deleteError) throw deleteError;
 
-      // Safely increment the event capacity
       const { data: updatedEvent, error: eventError } = await supabase
         .from("events")
         .update({ capacity: event.capacity + 1 })
