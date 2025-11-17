@@ -14,8 +14,8 @@ function Home() {
         onHoverLeave={() => setCurrentImage("/images/default.jpg")}
       />
 
-      <main className="flex-grow flex flex-col items-center bg-gray-50 p-10">
-        <div className="flex w-200 h-100 relative mb-10 justify-center">
+      <main className="flex-grow flex flex-col items-center bg-gray-50 px-4 sm:px-6 lg:px-10 py-6 sm:py-10">
+        <div className="w-full max-w-4xl aspect-video relative mb-6 sm:mb-10">
           <AnimatePresence mode="wait">
             <motion.img
               key={currentImage}
@@ -29,8 +29,10 @@ function Home() {
             />
           </AnimatePresence>
         </div>
-        <div className="mb-5" id="events-section">
-          <h1 className="text-3xl font-bold mt-5 mb-5">events</h1>
+        <div className="max-w-4xl mb-5" id="events-section">
+          <h1 className="text-2xl sm:text-3xl font-bold mt-5 mb-5 text-center sm:text-left">
+            events
+          </h1>
         </div>
         <EventList />
       </main>
