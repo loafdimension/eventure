@@ -59,33 +59,35 @@ function MyEvents() {
   return (
     <>
       <NavBar />
-      <div className="flex flex-col lg:flex-row gap-8 p-4 sm:p-6 md:p-10">
-        <div className="lg:w-2/4 flex flex-col items-center">
-          <p className="text-2xl sm:text-3xl font-bold mb-4 w-full text-center">
-            Upcoming Events
-          </p>
-
-          {loading ? (
-            <p className="text-lg text-gray-600 text-center">
-              Loading your events...
+      <main className="pt-16 sm:pt-20">
+        <div className="flex flex-col lg:flex-row gap-8 p-4 sm:p-6 md:p-10">
+          <div className="lg:w-2/4 flex flex-col items-center">
+            <p className="text-2xl sm:text-3xl font-bold mb-4 w-full text-center">
+              Upcoming Events
             </p>
-          ) : error ? (
-            <p className="text-red-600 text-center">{error}</p>
-          ) : bookedEvents.length === 0 ? (
-            <p className="text-gray-600 text-center">No booked events yet.</p>
-          ) : (
-            <EventsRow onHoverDate={setHoverDate} events={bookedEvents} />
-          )}
 
-          <div className="mt-6 flex justify-center w-full">
-            <BookMoreEvents />
+            {loading ? (
+              <p className="text-lg text-gray-600 text-center">
+                Loading your events...
+              </p>
+            ) : error ? (
+              <p className="text-red-600 text-center">{error}</p>
+            ) : bookedEvents.length === 0 ? (
+              <p className="text-gray-600 text-center">No booked events yet.</p>
+            ) : (
+              <EventsRow onHoverDate={setHoverDate} events={bookedEvents} />
+            )}
+
+            <div className="mt-6 flex justify-center w-full">
+              <BookMoreEvents />
+            </div>
+          </div>
+
+          <div className="lg:w-2/4 w-full mt-6 lg:mt-0">
+            <EventCalendar bookedEvents={bookedEvents} hoverDate={hoverDate} />
           </div>
         </div>
-
-        <div className="lg:w-2/4 w-full mt-6 lg:mt-0">
-          <EventCalendar bookedEvents={bookedEvents} hoverDate={hoverDate} />
-        </div>
-      </div>
+      </main>
     </>
   );
 }

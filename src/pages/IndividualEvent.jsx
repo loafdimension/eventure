@@ -217,105 +217,105 @@ function IndividualEvent() {
   return (
     <>
       <NavBar />
-      <div className="p-4 sm:p-6 md:p-10 flex flex-col items-center gap-6">
-        <img
-          src={imageUrl}
-          alt={event.title}
-          className="w-full max-w-3xl h-64 sm:h-80 md:h-96 object-cover rounded-xl shadow-md"
-        />
+      <main className="pt-16 sm:pt-20">
+        <div className="p-4 sm:p-6 md:p-10 flex flex-col items-center gap-6">
+          <img
+            src={imageUrl}
+            alt={event.title}
+            className="w-full max-w-3xl h-64 sm:h-80 md:h-96 object-cover rounded-xl shadow-md"
+          />
 
-        <div className="w-full max-w-3xl flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4">
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-start sm:items-center">
-            <p className="border rounded-lg p-1">
-              {event.capacity} places left!
-            </p>
-            <div className="border rounded-lg p-1 text-2xl flex items-center justify-center">
-              {getActivityIcon(event.activity_type)}
+          <div className="w-full max-w-3xl flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-start sm:items-center">
+              <p className="border rounded-lg p-1">
+                {event.capacity} places left!
+              </p>
+              <div className="border rounded-lg p-1 text-2xl flex items-center justify-center">
+                {getActivityIcon(event.activity_type)}
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+              {bookingStatus === "success" ? (
+                <>
+                  <button
+                    onClick={() =>
+                      shareEvent(event, () => setIsShareModalOpen(true))
+                    }
+                    className="border rounded-lg px-4 py-2 bg-gray-200 hover:bg-gray-300 transition w-full sm:w-auto"
+                  >
+                    Share
+                  </button>
+
+                  <button
+                    onClick={handleCancelBooking}
+                    className="border rounded-lg px-4 py-2 bg-red-600 text-white hover:bg-red-700 transition w-full sm:w-auto"
+                  >
+                    Cancel Booking
+                  </button>
+
+                  <button
+                    onClick={handleAddToGoogleCalendar}
+                    className="border rounded-lg px-4 py-2 bg-green-600 text-white hover:bg-green-700 transition w-full sm:w-auto"
+                  >
+                    Add to Google Calendar
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={handleBookEvent}
+                  disabled={bookingStatus === "loading" || event.capacity === 0}
+                  className={`border rounded-lg px-4 py-2 transition w-full sm:w-auto ${
+                    bookingStatus === "loading" || event.capacity === 0
+                      ? "bg-gray-400 text-white cursor-not-allowed"
+                      : "bg-blue-600 text-white hover:bg-blue-700"
+                  }`}
+                >
+                  {event.capacity === 0
+                    ? "Event Fully Booked"
+                    : bookingStatus === "loading"
+                    ? "Processing..."
+                    : "Book Event"}
+                </button>
+              )}
+
+              {userRole === "admin" && (
+                <button
+                  onClick={handleDeleteEvent}
+                  className="border rounded-lg px-4 py-2 bg-red-600 text-white hover:bg-red-700 transition w-full sm:w-auto"
+                >
+                  Delete Event
+                </button>
+              )}
             </div>
           </div>
 
- 
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-            {bookingStatus === "success" ? (
-              <>
-                <button
-                  onClick={() =>
-                    shareEvent(event, () => setIsShareModalOpen(true))
-                  }
-                  className="border rounded-lg px-4 py-2 bg-gray-200 hover:bg-gray-300 transition w-full sm:w-auto"
-                >
-                  Share
-                </button>
-
-                <button
-                  onClick={handleCancelBooking}
-                  className="border rounded-lg px-4 py-2 bg-red-600 text-white hover:bg-red-700 transition w-full sm:w-auto"
-                >
-                  Cancel Booking
-                </button>
-
-                <button
-                  onClick={handleAddToGoogleCalendar}
-                  className="border rounded-lg px-4 py-2 bg-green-600 text-white hover:bg-green-700 transition w-full sm:w-auto"
-                >
-                  Add to Google Calendar
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={handleBookEvent}
-                disabled={bookingStatus === "loading" || event.capacity === 0}
-                className={`border rounded-lg px-4 py-2 transition w-full sm:w-auto ${
-                  bookingStatus === "loading" || event.capacity === 0
-                    ? "bg-gray-400 text-white cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700"
-                }`}
-              >
-                {event.capacity === 0
-                  ? "Event Fully Booked"
-                  : bookingStatus === "loading"
-                  ? "Processing..."
-                  : "Book Event"}
-              </button>
-            )}
-
-            {userRole === "admin" && (
-              <button
-                onClick={handleDeleteEvent}
-                className="border rounded-lg px-4 py-2 bg-red-600 text-white hover:bg-red-700 transition w-full sm:w-auto"
-              >
-                Delete Event
-              </button>
-            )}
-          </div>
-        </div>
-
-
-        <div className="w-full max-w-3xl flex flex-col gap-3">
-          <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold">
-            {event.title}
-          </h1>
-          <p className="italic">
-            {displayPrice(event.price_type, event.price)}
-          </p>
-          <p>{event.description}</p>
-          <div className="mt-4">
-            <p className="font-bold">Date & Time</p>
-            <p>
-              {format(new Date(event.event_date), "EEE, dd MMM yyy, HH:mm")}
+          <div className="w-full max-w-3xl flex flex-col gap-3">
+            <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold">
+              {event.title}
+            </h1>
+            <p className="italic">
+              {displayPrice(event.price_type, event.price)}
+            </p>
+            <p>{event.description}</p>
+            <div className="mt-4">
+              <p className="font-bold">Date & Time</p>
+              <p>
+                {format(new Date(event.event_date), "EEE, dd MMM yyy, HH:mm")}
+              </p>
+            </div>
+            <div className="mt-4">
+              <p className="font-bold">Location</p>
+              <p>{event.location}</p>
+              <p>{event.location_description}</p>
+            </div>
+            <p className="mt-6 text-sm italic">
+              All payments are to be made in cash on the day of the event.
+              Online payments will be available soon!
             </p>
           </div>
-          <div className="mt-4">
-            <p className="font-bold">Location</p>
-            <p>{event.location}</p>
-            <p>{event.location_description}</p>
-          </div>
-          <p className="mt-6 text-sm italic">
-            All payments are to be made in cash on the day of the event. Online
-            payments will be available soon!
-          </p>
         </div>
-      </div>
+      </main>
 
       {isShareModalOpen && (
         <ShareModal event={event} onClose={() => setIsShareModalOpen(false)} />

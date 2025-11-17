@@ -5,11 +5,13 @@ function SignUp() {
   return (
     <>
       <NavBar />
-      <div className="flex flex-col p-3">
-        <div className="flex flex-col items-center mb-12">
-          <SignUpLogInForm />
+      <main className="pt-16 sm:pt-20">
+        <div className="flex flex-col p-3">
+          <div className="flex flex-col items-center mb-12">
+            <SignUpLogInForm />
+          </div>
         </div>
-      </div>
+      </main>
     </>
   );
 }
