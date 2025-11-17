@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react"; // Hamburger and close icons
+import { Menu, X } from "lucide-react"; 
 import Logo from "./Logo";
 import ActivityButtons from "./ActivityButtons";
 import NavBarButtons from "./NavBarButtons";
