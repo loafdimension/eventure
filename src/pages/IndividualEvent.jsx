@@ -217,15 +217,15 @@ function IndividualEvent() {
   return (
     <>
       <NavBar />
-      <div className="p-10 flex flex-col items-center">
+      <div className="p-4 sm:p-6 md:p-10 flex flex-col items-center gap-6">
         <img
           src={imageUrl}
           alt={event.title}
-          className="w-full max-w-3xl h-96 object-cover rounded-xl shadow-md mb-6"
+          className="w-full max-w-3xl h-64 sm:h-80 md:h-96 object-cover rounded-xl shadow-md"
         />
 
-        <div className="w-full max-w-3xl flex justify-between items-center mb-4 gap-4">
-          <div className="flex gap-2">
+        <div className="w-full max-w-3xl flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-start sm:items-center">
             <p className="border rounded-lg p-1">
               {event.capacity} places left!
             </p>
@@ -234,28 +234,29 @@ function IndividualEvent() {
             </div>
           </div>
 
-          <div className="flex gap-3 items-center">
+ 
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
             {bookingStatus === "success" ? (
               <>
                 <button
                   onClick={() =>
                     shareEvent(event, () => setIsShareModalOpen(true))
                   }
-                  className="border rounded-lg px-4 py-2 bg-gray-200 hover:bg-gray-300 transition"
+                  className="border rounded-lg px-4 py-2 bg-gray-200 hover:bg-gray-300 transition w-full sm:w-auto"
                 >
                   Share
                 </button>
 
                 <button
                   onClick={handleCancelBooking}
-                  className="border rounded-lg px-4 py-2 bg-red-600 text-white hover:bg-red-700 transition"
+                  className="border rounded-lg px-4 py-2 bg-red-600 text-white hover:bg-red-700 transition w-full sm:w-auto"
                 >
                   Cancel Booking
                 </button>
 
                 <button
                   onClick={handleAddToGoogleCalendar}
-                  className="border rounded-lg px-4 py-2 bg-green-600 text-white hover:bg-green-700 transition"
+                  className="border rounded-lg px-4 py-2 bg-green-600 text-white hover:bg-green-700 transition w-full sm:w-auto"
                 >
                   Add to Google Calendar
                 </button>
@@ -264,7 +265,7 @@ function IndividualEvent() {
               <button
                 onClick={handleBookEvent}
                 disabled={bookingStatus === "loading" || event.capacity === 0}
-                className={`border rounded-lg px-4 py-2 transition ${
+                className={`border rounded-lg px-4 py-2 transition w-full sm:w-auto ${
                   bookingStatus === "loading" || event.capacity === 0
                     ? "bg-gray-400 text-white cursor-not-allowed"
                     : "bg-blue-600 text-white hover:bg-blue-700"
@@ -281,7 +282,7 @@ function IndividualEvent() {
             {userRole === "admin" && (
               <button
                 onClick={handleDeleteEvent}
-                className="border rounded-lg px-4 py-2 bg-red-600 text-white hover:bg-red-700 transition"
+                className="border rounded-lg px-4 py-2 bg-red-600 text-white hover:bg-red-700 transition w-full sm:w-auto"
               >
                 Delete Event
               </button>
@@ -289,22 +290,29 @@ function IndividualEvent() {
           </div>
         </div>
 
-        <div className="w-full max-w-3xl flex flex-col gap-2">
-          <h1 className="text-3xl font-bold">{event.title}</h1>
+
+        <div className="w-full max-w-3xl flex flex-col gap-3">
+          <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold">
+            {event.title}
+          </h1>
           <p className="italic">
             {displayPrice(event.price_type, event.price)}
           </p>
           <p>{event.description}</p>
-          <p className="mt-5 font-bold">Date & Time</p>
-          <p>{format(new Date(event.event_date), "EEE, dd MMM yyy, HH:mm")}</p>
-          <p className="mt-5 font-bold">Location - {event.location}</p>
-          <p>{event.location_description}</p>
-          <p className="mt-20">
-            <em>
-              All payments are to be made in cash on the day of the event
-              because our developer ran out of time to integrate online
-              payments, but this seervice will be available soon!
-            </em>
+          <div className="mt-4">
+            <p className="font-bold">Date & Time</p>
+            <p>
+              {format(new Date(event.event_date), "EEE, dd MMM yyy, HH:mm")}
+            </p>
+          </div>
+          <div className="mt-4">
+            <p className="font-bold">Location</p>
+            <p>{event.location}</p>
+            <p>{event.location_description}</p>
+          </div>
+          <p className="mt-6 text-sm italic">
+            All payments are to be made in cash on the day of the event. Online
+            payments will be available soon!
           </p>
         </div>
       </div>
