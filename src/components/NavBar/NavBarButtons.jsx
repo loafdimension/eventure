@@ -63,7 +63,7 @@ function NavBarButtons() {
               to="/signup-login"
               className="hover:text-indigo-600 font-semibold text-xl"
             >
-              Sign Up / Log In
+              Sign In
             </Link>
           )}
         </div>
